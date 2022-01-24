@@ -1,0 +1,73 @@
+1
+TEST DATA                                           
+ 787-        3958
+ 791
+1REFERENCE RUN NO.  0    CASE NO.   1
+THE FOLLOWING DATA IS INPUT DATA
+    IEND KEND
+      0    0   0       0.000    0.00     0.00           0.   0   0    0    0    0    0       0.00      0.00
+  SEG. M3  M5  ISTRES  IA  IFLAG H------P------  N6  N2  -----AM-----   --------F--------          DELTA Y1          DELTA Y11
+
+REFERNCE RUN NO.      0    CASE NO.      0
+THE FOLLOWING DATA IS INPUT DATA
+SEG. H---N SUB 01---  ---N SUB 02---  ---N SUB 03---  --SIG DY1--  --SIG DY2--  --SIG DY3--
+
+REFERNCE RUN NO.      0    CASE NO.      0
+THE FOLLOWING DATA IS INPUT DATA
+  SEG.   KSIGMA   SLOPE     VE    -----W----      P1          P2         B1       B2          A-BAR     -------T------    N
+
+REFERENCE RUN NO.     0    CASE NO     0
+INDIVIDUAL SEGMENT AND TOTAL DAMAGE SUMMARY
+        SEG.       DAMAGE           TOTAL
+
+CALLING RANDOM PROGRAM
+  1716
+SPECTRUM LOADING SEQUENCE GENERATION PROGRAM               PAGE    1
+
+     JOB TITLE                                                                                  
+
+
+               NUMBER OF FLIGHT TYPES IS.......................    2
+               VALLEY/PEAK COUPLING IS..(1=A6PA, 2=RANDOM).....    2
+               FLIGHT SEQUENCE IS..(C=RANDOM...................    0
+               ..........(N=INPUT FLIGHT SEQUENCE, NSETS)......
+               FORTRAN UNIT NUMBER IS..........................    1
+               NUMBER OF INPUT PEAK LEVELS IS..................   48
+               NUMBER OF INPUT RANGE LEVELS IS.................   43
+               NUMBER OF INPUT VALLEY/PEAK RATIOS IS...........   26
+               SAVE SPECTRUM ON MAGNETIC TAPE..................    3
+               ..........................(0 = NO, 3 = YES).....
+               NUMBER OF POINTS OF THE RANGE VS R INPUT CURVE IS....    3
+               PRINT FLIGHT SEQUENCE (-1 = NO, 0 = ALL, N = NUMBER).   50
+               NUMBER OF SPECTRUM SUMMATIONS TO BE PRINTED ....    1
+               PROGRAM TERMINATION FLAG (0 = NORMAL, ..........
+               ..................M = STOP AFTER M FLIGHTS......    0
+               ALTERNATE FLIGHT SEQUENCE FLAG..................    0
+               .(0 = REANDOM, 1=LOW-HI, 2=HI-LOW, 3=LO-HI-LO)....
+               NUMBER OF HIGHEST PEAKS PER FLIGHT TO BE PRINTED.   20
+               STARTING VALUE FOR THE GENERATION OF RANDOM.......
+               .FLIGHT NUMBERS (0 = DEFAULT DEFINED AS 11111).    0
+               STARTING VALUE FOR THE RANDOM CYCLE GENERATION.    0
+               .........(0 = DEFAULT DEFINED AS 12345)...........
+               PEAK CLIPPING VALUE IS.............................    90000.
+               VALLEY CLIPPING VALUE IS.........................   -90000.
+               MULTIPLICATION FACTOR IS.........................   1.00000
+               CYCLE ELIMINATION PEAKVALUE IS.................    90000.
+
+
+     PEAK LEVELS FOR SPECTRUM SUMATION
+      -8000.      39000.       2000.      44000.         -2.          1.        -10.       4000.          0.       4000.
+         10.       4000.       2528.          1.          2.          2.          3.          4.          4.          4.
+          4.          4.          4.          4.          5.          6.          6.          7.          8.          8.
+          8.          8.          8.          0.          8.          9.         10.         10.         11.         12.
+         12.         13.         14.         14.         15.         16.         17.          1.
+     INPUT RANGE LEVELS FOR SPECTRUM SUMMATION
+          1.          1.          1.          1.          1.          1.          1.          1.          1.          1.
+          1.          1.          1.          1.          1.          1.          1.          1.          1.          1.
+          1.          2.          2.          2.          2.          2.          2.          2.          2.          2.
+          2.          2.          2.          2.          2.          2.          2.          2.          2.          2.
+          2.          2.          2.
+     INPUT VALLEY/PEAK RATIOS FOR SPECTRUMSUMMATION
+       1.000  1.080  1.160  1.240  1.320  1.400  1.480  1.560  1.640  1.720  1.800  1.880  1.960  2.040  2.120  2.200  2.280  2.360
+     INPUT VALLEY/PEAK RATIOS FOR SPECTRUMSUMMATION
+       2.440  2.520  2.600  2.680  2.760  2.840  2.920  2.000
