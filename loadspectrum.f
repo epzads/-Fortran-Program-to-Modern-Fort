@@ -39,12 +39,12 @@ C***  DOUBLE PRECISION DATA
      4   (IW3, X(199)), (IW4, X(200)), (IRR, X(201)), (ICASE, X(202)),
      5   (IW5, X(203)), (TAB6, X(206)), (DELT2, X(231)), 
      6   (DELY1, X(256)), (DELY11, X(296)), (ARNO1, X(336)), 
-     7   (ARNO2, X(376)), (ARNO3, X(416)), (SIGMAX1, X(456)), 
-     8   (SIGMAX2, X(496)), (SIGMAX3, X(536)), (T, X(576)), 
+     7   (ARNO2, X(376)), (ARNO3, X(416)), (SGMAX1, X(456)), 
+     8   (SGMAX2, X(496)), (SGMAX3, X(536)), (T, X(576)), 
      9   (AKSIG, X(616)), (SLOPE, X(656)), (VELOS, X(696)), (WT, 
      A   X(737)), (P1, X(776)), (TBLM2, X(853))
          EQUIVALENCE (P2, X(1473)), (AK1, X(1513)), (AK2, X(1553)),
-     1   (ABR, X(1593)), (TA, X(12633)), (M3, X(1673)), (SIG, X(1713)),
+     1   (ABR, X(1593)), (IA, X(1633)), (M3, X(1673)), (SIG, X(1713)),
      2   (AM, X(1753)), (N, X(1793)), (NEND, X(1833)), (AL6, X(1850)),
      3   (AL5, X(1851)), (AL4, X(1852)), (AL3, X(1853)), (AL2, X(1854)),
      4   (AL1, X(1855)), (TBLI2, X(1856)), (M5, X(3398)),
@@ -751,7 +751,9 @@ C***  NLL = N
             IF (ENTRY1 .EQ. 2) GO TO 190
 
    10       FORMAT (I1, 4(I5, A1, I8, 2A1), 3X, I2, I3)
-   70       READ (5,10) IC1, (L(I), IS(I), IV(I), IE1(I), IE2(I), 
+   70       READ (5,10) IC1, (L(I), IS(I), IV(I), IE1(I), IE2(I),
+     1                  I=1, 4), REFNO, CASENO
+            WRITE(7,*) IC1, (L(I), IS(I), IV(I), IE1(I), IE2(I),
      1                  I=1, 4), REFNO, CASENO
             IF ((REFNO .EQ. 99) .AND. (CASENO .EQ. 999)) NER3 = .TRUE.
             IF (ENTRY1 .EQ. 0) GO TO 190
@@ -762,7 +764,8 @@ C***  NLL = N
 
 C     TEST FOR END OF CURRENT CASE
 
-   80       IF (CASNUM .EQ. CASENO) GO TO 170
+   80       write(7,*) '80 CASNUM,CASENO',CASNUM,CASENO
+            IF (CASNUM .EQ. CASENO) GO TO 170
             IF (NER3) ENTRY1 = -1
 
 C     CHECK FOR PAST ERRORS
@@ -772,6 +775,7 @@ C     CHECK FOR PAST ERRORS
 C     PRINT (IF KP = 0 OR 1) OUTPUT TITLE AND EXIT FROM SUBROUTINE
 
             IF (KKKK .GT. 40) GO TO 90
+            write(7,*) 'bef 90'
             WRITE (6,30) ITB(KKKK), REFNUM, CASNUM
    90       IREF = REFNUM
             ICAS = CASNUM
@@ -792,26 +796,27 @@ C     TEST FOR REFERENCE RUN DATA AND ARRAY
 
 C     SET CASE ARRAY TO ZERO (NO REFERENCE RUN DATA)
 
-  120       write(6,*) '787-',NLL
-            DO 130 I = 1, NLL
+  120       DO 130 I = 1, NLL
   130       CASE(I) = 0.0
             REFNUM = 0.0
-            write(6,*) '791'
             GO TO 180
 
 C     MOVE REFERENCE RUN ARRAY INTO CASE ARRAY
 
-  140       CASNUM = CASENO
+  140       write(7,*) '140'
+            CASNUM = CASENO
   150       DO 160 I = 1, NLL
   160       CASE(I) = RRAREA(I)
 
-  170       IF (REFNUM .NE. REFNO) GO TO 440
+  170       write(7,*) '170 REFNUM, REFNO', REFNUM, REFNO
+            IF (REFNUM .NE. REFNO) GO TO 440
   180       CASNUM = CASENO
             GO TO 220
 
 C     INITIAL ENTRY (ENTRY1 = 0 OR 2)
 
-  190       ENTRY1 = 1
+  190       write(7,*) '190'
+            ENTRY1 = 1
             REFNUM = -1
             CASNUM = -1
 
@@ -845,7 +850,9 @@ C     CONVERT, CHECK, AND (IF CORRECT) STORE 4 ETS OF DATA FIELDS
 
 C     CHECK SIGN FIELD (AND IF BLANK, SKIP TO NEXT SET OF FIELDS)
 
+               write(7,*) 'check JS', JS, ITB(21)
                IF (JS .EQ. ITB(21)) GO TO 350
+               write(7,*) 'aft check JS'
 
 C     TEST LOCATION FOR VALID RANGE
 
@@ -862,7 +869,8 @@ C     FIND AND CHEDK SIGN FIELD VALUE
 
 C     CHECK FOR VALID VALUE FIELD - CONVERT AND STORE SIGN AND VALUE
 
-  240          IF (JV .LT. 0) GO TO 390
+  240          write(7,*) '240 K,JV',K,JV
+               IF (JV .LT. 0) GO TO 390
                IF ( K. NE. 11) GO TO 250
                N = -JV
                GO TO 260
@@ -873,6 +881,7 @@ C     CHECK EXPONENT FOR FLOATING POINT
 
   260          IF ((IE1(I) .EQ. IX) .AND. (IE2(I) .EQ. IX))
      1            GO TO 330
+               write(7,*) 'aft 260 N',N
 
 C     CONVERT AND CHECK FLOATING EXPONENET
 
@@ -881,7 +890,8 @@ C     CONVERT AND CHECK FLOATING EXPONENET
                K = K + 1
                IF (K .EQ. 21) GO TO 420
                GO TO 270
-  280          N2 = ITN(K)
+  280          write(7,*) '280 K,IE2(I)',K,IE2(I)
+               N2 = ITN(K)
                IF (K .GT. 10) GO TO 410
 
                K = 1
@@ -895,7 +905,8 @@ C     CONVERT AND CHECK FLOATING EXPONENET
   310          N1 = ITN(K)
                N3 = ISIGN( 10 * IABS( N1 ) + N2, N1 )
 
-  320          IF  (N3 .LT. (-60)  .OR.  (N3 .GT. 70))  GO TO 380
+  320          write(7,*)'320, N1,N2,N3',N1,N2,N3
+               IF  (N3 .LT. (-60)  .OR.  (N3 .GT. 70))  GO TO 380
 
 C     CONVERT VALUE (N) TO FLOATING POINT (USING EXPONENT)
 
@@ -903,11 +914,12 @@ C     CONVERT VALUE (N) TO FLOATING POINT (USING EXPONENT)
                AN = A * (10.0 ** (N3 - 9))
 
 C     STORE ANSWER IN LOATION J OF REGERENCE RUN OR CASE ARRAYS
-
-  330          IF (CASENO .EQ. 0)  GO TO 340
+  330          write(7,*)'I,J,CASENO,AN ',I,J,CASENO, AN
+99330          IF (CASENO .EQ. 0)  GO TO 340
                CASE(J) = AN
                GO TO 350
   340          RRAREA(J) = AN
+               write(7,*) '911'
   350       CONTINUE
             GO TO 70
 
@@ -926,6 +938,7 @@ C     SET ERROCODE
   460       NER = NER + 1
             NER1 = .TRUE.
             IF (REFRUN .AND. CASENO .EQ. 0) NER2 = .TRUE.
+            write(7,*) 'NER,NER1,NER2',NER,NER1,NER2
 
 C     WRITE ERROR MESSAGES
 
@@ -1065,8 +1078,8 @@ C     TERMINATE WHEN ALL DATA HAS BEEN READ
      5      (IW4, X(200)),	(IRR, X(201)), (ICASE, X(202)), 
      6      (IW5,	X(203)), (TAB6,	X(206)), (DELT2, X(231)), 
      7      (DELY1, X(256)), (DELY11, X(296)), (ARINO1, X(336)), 
-     8      (ARNO2, X(376)), (ARNO3, X(416)), (SIGMAX1, X(456)), 
-     9      (SIGMAX2, X(496)), (SIGMAX3, X(536)), (T, X(576)), 
+     8      (ARNO2, X(376)), (ARNO3, X(416)), (SGMAX1, X(456)), 
+     9      (SGMAX2, X(496)), (SGMAX3, X(536)), (T, X(576)), 
      A      (AKSIG, X(616)), (SLOPE, X(656)), (VELOS, X(696)), 
      B      (WT, X(736)), (PI, X(776)), (TBLM2, X(853))
             EQUIVALENCE (P2, X(1473)), (AK1, X(1513)), (AK2, X(1553)),
@@ -1087,11 +1100,11 @@ C     TERMINATE WHEN ALL DATA HAS BEEN READ
      1                  (YAW, X(3839)), (CYBT, X(3879)), 
      2                  (CYBT0, X(3919))
    10       FORMAT ('REFERNCE RUN NO. ', I6, 4X, 'CASE NO. ', I6)
-   20       FORMAT (4X, 'IEND', 1X, 'I4', 4X, 'S-ULT.', 3X,
-     1      '---S---', 3X, '0-BAR-', '---NEND---', 2X, 'L1', 2X, 'IW1',
-     2      22X, 'IW2', 2X, 'IW3', 2X, 'IW4', 2X, 'IW5')
-   25       FORMAT (4X, 'IEND', 1X, 'KEND', 1X, I4, 4X, 'S-ULT.', 3X, 
-     1               '---S---', 3X, '-BAR-', 3X, '---NEND---', 3X, 'L1',
+   20       FORMAT (4X, 'IEND', 1X,'KEND', 1X, 'I4', 4X, 'S-ULT.', 3X,
+     1      '---S---',3X,'C-BAR-',3X,'---NEND---',2X,'L1', 2X, 'IW1',
+     2      2X, 'IW2', 2X, 'IW3', 2X, 'IW4', 2X, 'IW5')
+   25       FORMAT (4X, 'IEND', 1X, 'KEND', 1X, 'I4', 4X, 'S-ULT.', 3X, 
+     1               '---S---', 3X, 'C-BAR-', 3X, '---NEND---', 3X, 'L1',
      2               3X, 'IW1', 2X, 'IW2', 2X, 'IW3', 2X, 'IW4', 2X,
      3               'IW5', 2X, 'V.T.CHORD', 'V.T.AREA.') 
    30       FORMAT (5X, I2, 3X, I2, 2X, I2, F12.3, F8.2, 2X, F7.2,
@@ -1155,10 +1168,10 @@ C     TERMINATE WHEN ALL DATA HAS BEEN READ
   230       FORMAT (4X, 'LL', 4X, 'MAX STRESS(3)', 2X, 
      1      'MIN STRESS(3)', 6X,'CYCLES(3)')
   240       FORMAT (4X, I2, F17.0, F15.0, F18.0)
-  250       FORMAT (2X, 'S-N TABLE = I2', 2X, 'IA AND/OR I4 = I2')
-  260       FORMAT (4X, 'NO. OF Y ENTRIES = F4.0', 4X,
-     1       'NO. OF X ENTRIES = F4.0', 2X, 'MAX CYCLES TO FAILURE = '
-     2        'F12.0')
+  250       FORMAT (2X, 'S-N TABLE = ',I2, 2X, 'IA AND/OR I4 = ',I2)
+  260       FORMAT (4X, 'NO. OF Y ENTRIES = ',F4.0, 4X,
+     1       'NO. OF X ENTRIES = ',F4.0, 2X, 'MAX CYCLES TO FAILURE = ',
+     2        F12.0)
   270       FORMAT (7X, 'Y', 12X, 'X', 10X, 'Y1,X', 9X, 'Y2,X', 9X,
      1      'Y3,X', 9X, 'Y4,X', 9X, 'Y5,X', 9X, 'Y6,X', 9X, 'Y7,X')
   280       FORMAT (F12.3, F14.4, F13.0, F13.0, F13.0,
@@ -1179,8 +1192,8 @@ C     TERMINATE WHEN ALL DATA HAS BEEN READ
      1      L1, IW1, IW2, IW3, IW4, IW5, CBART, AST
             GO TO 327
   325       WRITE (6,20)
-            WRITE (6,30) IEND, KEND, I4, SIGULT, WAREA, AC, NEND, L1, 
-     1      IW1, IW2, IW3, I24, IW5
+            WRITE (6,30) IEND, KEND, I4,SIGULT,WAREA,AC,float(NEND),
+     1                   L1, IW1, IW2, IW3, IW4, IW5
   327       WRITE (6,40)
             WRITE (6,50) (I, M3(I), M5(I), ISTRES(I), IA(I), N1FLAG(I), 
      1                    P(I), N6(I), N2(I), AM(I), F(I), DELY1(I), 
@@ -1262,7 +1275,7 @@ C     TERMINATE WHEN ALL DATA HAS BEEN READ
             WRITE (6,120)
             WRITE (6,140) (J, TBLM2(J), TBLM2(J+31), TBLM2(J+62), 
      1                     TBLM2(J+93), TBLM2(J+124), TBLM2(J+155), 
-     2                     TBLM2(J+186), TBLM2(J+217), J = 1, 315)
+     2                     TBLM2(J+186), TBLM2(J+217), J = 1, 31)
   500       DO 510 I = 1, IEND
                IF((ISTRES(I) .GT. 8) .AND. (ISTRES(I) .LT. 15)) 
      1           GO TO 520
@@ -1626,7 +1639,7 @@ C        OUTPUT = INTERPOLATED VALUE OF Z = F(X,Y)
             EX = ALOG10(TABLE(IN)) + BX * (ALOG10(TABLE(IN + 16)) -
      1      ALOG10(TABLE(IN)))
             FX = TABLE(IX + 17) - TABLE(IX + 16) + BX * (TABLE(IX + 18) 
-     1           - 2.0) * (TABLE (X + 17) + TABLE(IX + 16))
+     1           - 2.0) * (TABLE (IX + 17) + TABLE(IX + 16))
             IF (FX .EQ. 0.0) FX = 1.0
             OUTPUT = ALOG10(TABLE(IN)) + BX * (ALOG10(TABLE(IN + 16)) -
      1      ALOG10(TABLE(IN))) + (((CS) * (DX - EX)) / (FX))
@@ -1832,7 +1845,9 @@ C*********  INPUT DATA.  IT SETS UP THE CORE STORAGE REQUIRED FOR  *****
 C*********  THE CALLS TO SUBROUTINES INMMN, GENFL, AND GENAFS.     *****
 C*********  SUBROUTINES CALLED - ERROR, GENAFS, GENFL, INMMN,      *****
 C*********                       NEWPG, OPENMS, WTAPE              *****
-            DIMENSION NS(NFT), IF1(NST), IF2(NST), N(*), NF(NFT), 
+            REAL N(*)                                              ! PSV
+C           DIMENSION NS(NFT), IF1(NST), IF2(NST), N(*), NF(NFT),  ! PSV
+            DIMENSION NS(NFT), IF1(NST), IF2(NST), NF(NFT), 
      1                NFRS(2,1)
             DIMENSION PI(I), RAN(*), VP(*), XY(2,1), ISS (*)
             COMMON NPG, TITLE(20), NSIZE, LEFT, IERR, IRS, IUIL, NPI, 
@@ -1992,7 +2007,7 @@ C************ USE IN THE SUBROUTINE GENFL.                       *******
             MINDEX = MCY
             MJTN = MINDEX
             MFF = MJTN
-            IF (IAFS .EQ. 0) GO TO 370
+            IF (IAFS .EQ. 0) GO TO 370    ! ?PSV
             MCY = MPMAX + NTF
             MINDEX = MCY + NTF
             MJTN = MINDEX + (NTF + 1)
@@ -2544,8 +2559,8 @@ C**********  SEQUENCE OF MAXIMUM AND MINIMUM STRESES.
   210                IF (I .NE. NPSS) GO TO 220
 C********** PRINT THE SPECTRUM SUMMATION
 C********** PRINT THE SPECTRUM SUMMATION
-                     CALL PRNTSS (RR, NNRAN, PR, NPI, IRR, NRMAX, 
-     1                            IIVP, RAN, VP, PI, IS, NPF, ISS, I, 
+                     CALL PRNTSS (RR, NNRAN, PR, NNPI, IRR, NRMAX, 
+     1                            IIVP, RAN, VP, PI, IS, NFF, ISS, I, 
      2                            NTF, HPEAK, IDPEAK)
   220                IF (I .EQ. NPTF) GO TO 240
   230             CONTINUE
