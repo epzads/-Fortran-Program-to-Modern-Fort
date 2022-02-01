@@ -33,7 +33,7 @@ C***  DOUBLE PRECISION DATA
      3   DATAIN(13), SCLTRB(40), TKSIG(257), SIG(40)
          DIMENSION TBLSN(257), TBLLD(31)
          EQUIVALENCE (IEND, X(1)), (KEND, X(2)), (I4, X(3)),
-     1   (SIGULT, X(4)), (WAREA, X(4)), (ISTRES, X(6)), (DELT1, X(46)),
+     1   (SIGULT, X(4)), (WAREA, X(5)), (ISTRES, X(6)), (DELT1, X(46)),
      2   (TAB1, X(71)), (TAB2, X(96)), (TAB3, X(121)), (TAB4, X(146)),
      3   (TAB5, X(171)), (AC, X(156)), (IW1, X(197)), (IW2, X(198)),
      4   (IW3, X(199)), (IW4, X(200)), (IRR, X(201)), (ICASE, X(202)),
@@ -84,7 +84,9 @@ C  20    FORMAT (13A6)  ! PSV
    80    CONTINUE
    85    II = 0
    90    N3958 = 3958
+         write(9,*) 'bef inp',X(1),int(X(1)),IEND,CSUM(1,1)
          CALL NPUT1A (X(1), N3958, Y(1), II, IREF, ICAS, 0)
+         write(9,*) 'aft inp',X(1),int(X(1)),IEND,CSUM(1,1)
   100    FORMAT ('REFERENCE RUN NO.', I6, 4X, 'CASE NO', I6)
 C***  WRITE REFERENCE RUN, CASE NO., AND SEGMENTS ON TAPE FOR
 C***  SPECTRUM LOADING RANDOM SEQUIENCE GENERATION PROGRAM
@@ -92,20 +94,31 @@ C***  SPECTRUM LOADING RANDOM SEQUIENCE GENERATION PROGRAM
          WLPRNT = 0.0
          IF (IW5 .EQ. 2) GO TO 110
          CALL PRINT
+         write(9,*) 'aft prn',X(201),int(X(201)),IRR
+         close(9)
          WLPRNT = 1.0
   110    B = 0.0
          K1(1) = 0
          TCDMGM = 0.0
+         write(9,*) 'T:',T
+         write(9,*) 'TAB1:',TAB1
+         write(9,*) 'TAB2:',TAB2
+         write(9,*) 'TAB3:',TAB3
+         write(9,*) 'TAB4:',TAB4
+         write(9,*) 'TAB5:',TAB5
+         write(9,*) 'TAB6:',TAB6
   120    DO 1070 I = 1, IEND
+            write(8,*) 'start cycle 1070 I ',I
             DO 130 KJ = 1, 257
   130       TBLSN (KJ) = 0.0
             DO 140 KJ = 1, 31
   140       TBLLD (KJ) = 0.0
             INTPER = 0
-            IF (8 .EQ. 1.0) GO TO 540
+            IF (B .EQ. 1.0) GO TO 540
             AX = 0.0
             CDMGM (I) = 0.0
             JEND = N(I)
+            write(8,*) 'JEND ',JEND
             K = JEND - 1
             Q = 1.0
 C     SELECTION IS MADE WHETHER OR NOT TO USE THE MULTIPLYING
@@ -114,11 +127,12 @@ C     FACTOR F(I)
   150       D = 1.0
             GO TO 170
   160       D = F(I)
-  170       IF ((M3(I) .GT. 5) .AND. (M3(I) .LT. 131)) GO TO 380
+  170       IF ((M3(I) .GT. 9) .AND. (M3(I) .LT. 13)) GO TO 380
 C     LOAD SPECTRUM INPUT FORMAT IS SELECTED
             DO 260 J = 1, JEND
+            write(8,*) 'start cycle 260 I,IEND,J,JEND ',I,IEND,J,JEND
             M6 = M5(I)
-            GO TO (180,150,200,210,220,230,240), M6
+            GO TO (180,190,200,210,220,230,240), M6
 C     CALCULATE THE INCREMETAL RESPONSE DELTAY
   180       DELTAY(J) = DELT1(J)
             GO TO 250
@@ -139,6 +153,7 @@ C     CALCULATE THE INCREMETAL RESPONSE DELTAY
 C     ESTABLISH MAX AND MIN RESPONSE VALUES AT MIDPOINTS BETWEEN
 C     SUCCESSIVE DELTA Y VALUES
             DO 310 J = 1, K
+               write(8,*) 'start cycle 310'
                AMIDY(J) = (DELTAY(J) + DELTAY(J + 1))/2.0
                IF(IW3 .EQ. 1) GO TO 270
                P(I) = 0.0
@@ -177,6 +192,7 @@ C     SUCCESSIVE DELTA Y VALUES
             AKSIG(I) = OUTPUT
             AKSIG(I) = R1 * AKSIG(I)
   380       DO 520 J = 1, JEND
+            write(8,*) 'start cycle 520'
 C     CALCULATE THE CUMULATIVE CYCLES GIVEN VALUES OF DELTA Y
                IF (M3(I) .EQ. 13) GO TO 460
                IF ((M3(I) .EQ. 14) .OR. (M3(I) .EQ. 15)) GO TO 455
@@ -199,7 +215,7 @@ C     CALCULATE THE CUMULATIVE CYCLES GIVEN VALUES OF DELTA Y
      1                   (2.0*(SGMAX1(I))**2))
      2                 +  ARNO2(I)*EXP(-DELTAY(J)**2/
      3                   (2.0*(SGMAX2(I))**2))
-     4                 +   ARNO3(I)*EXP(-DELTAY(J)**2/
+     4                 +  ARNO3(I)*EXP(-DELTAY(J)**2/
      5                   (2.0*(SGMAX3(I))**2))) *  T(I)
                GO TO 510
   460          ABR(I) = (VELOS(I)*SLOPE(I)*WAREA*AKSIG(I))/(498.0*WT(I))
@@ -238,13 +254,16 @@ C     CALCULATE THE CUMULATIVE CYCLES GIVEN VALUES OF DELTA Y
                GO TO 520
   510          CSUM(I,J) = CUMM(J)
   520       CONTINUE
+            write(9,*) 'CUMM:',CUMM
+            write(9,*) 'DELTAY:',DELTAY
             K1(I) = K
             IF(AX .EQ. 1.0) GO TO 540
 C     CALCULATE CYCLES FOR Y MAX AND Y MIN.
             DO 530 J = 1, K
-               CYCLSM(I,J) = (CUMM(J) - CUMM(J1))
+               CYCLSM(I,J) = (CUMM(J) - CUMM(J+1))
   530       CONTINUE
   540       DO 940 J = 1, K
+               write(8,*) 'start cycle 940'
                IF(B .EQ. 1.0) GO TO 800
                IF(AX .EQ. 1.0) GO TO 720
 C     SELECT WHETHER TO ENTER OR NOT TO ENTER THE STRESS TABLES.
@@ -291,8 +310,8 @@ C     ALGEBRAICALLY, MAX STRESS GREATER THAN MIN STRESS.
   700          NSEG = I
                LEVEL = J
                WRITE (6,710) XARG, YARG, NSEG, LEVEL
-  710          FORMAT ('SN, INTP ERROR X IS TOO SMALL X = E14.6', 1X,
-     1         'Y IS TOO SMALL Y = E14.6', 1X, 'SEG =', I2, 1X,
+  710          FORMAT ('SN, INTP ERROR X IS TOO SMALL X = ',E14.6, 1X,
+     1         'Y IS TOO SMALL Y = ',E14.6, 1X, 'SEG =', I2, 1X,
      2         'LOAD LEVEL =', I2, 1X, 'DAMAGE SET = 0.0')
                INTPER = 0
                GO TO 940
@@ -318,7 +337,7 @@ C     FROM S-N DATA
   800          I2 = (257 *I2) - 256
                DO 810 ISETTB = 1, 257
                   I10 = ISETTB +I2 -1
-  810          TBLSN(ISETTB) = TBLI2(110)
+  810          TBLSN(ISETTB) = TBLI2(I10)
                XARGMN = TBLSN(18)
                YARGMN = TBLSN(2) - 0.001
   820          IF (XARG - XARGMN) 830,840,840
@@ -332,7 +351,7 @@ C     GIVEN THE INTERPOLATING VALUES XARG AND YARG, INTERPOLATE FOR A
 C     VALUE OF CYCLES TO FAILURE.
                CALL TWOVIN (XARG, YARG, TBLSN, OUTPUT, NSEG, LEVEL)
   850          GO TO (860,870,880,890,900,910), ICALL
-  860          ALIFE = ALI
+  860          ALIFE = AL1
                GO TO 920
   870          ALIFE = AL2
                GO TO 920
@@ -347,6 +366,7 @@ C     VALUE OF CYCLES TO FAILURE.
                ALIFE = ALOG10(ALIFE)
                IF (OUTPUT - ALIFE) 930,690,690
   930          CYC(J) = 10** OUTPUT
+               write(9,*) 'OUTPUT,ALIFE',OUTPUT,ALIFE
 C     FORM THE RATIO DAMAGE = CYCLES EXPERIENCED AT TA GIVEN RESPONSE
 C     LEVEL / CYCLES TO FAILURE AT THE RESPONSE LEVEL.
                DMAGEM(J) = CYCLSM(I,J) / CYC(J)
@@ -366,7 +386,7 @@ C              SPECTRUM LOADING RANDOM SEQUENCE GENERATION PROGRAM
             WLPRNT = 1.0
             IF (IW5 .LT. 2) GO TO 950
             IF (I -1) 960,960,950
-  950       WRITE (6,100) IFF, ICASE
+  950       WRITE (6,100) IRR, ICASE
   960       WRITE (6,970) I
   970       FORMAT(4X, 'SEGMENT =', I2)
             WRITE (6,980)
@@ -381,7 +401,7 @@ C              SPECTRUM LOADING RANDOM SEQUENCE GENERATION PROGRAM
             DO 1050 J = 1, JEND
                IF ((M3(I) .GT. 9) .AND. (M3(I) .LT. 13)) GO TO 1010
                WRITE (6,1000) J, DELTAY(J), CUMM(J)
- 1000          FORMAT (1H, 4X, I2)
+ 1000          FORMAT (1H, 4X, I2, F13.3,1X,F16.4)
                IF (J . EQ. JEND) GO TO 1050
                IF ((M3(I) .LT. 10) .OR. (M3(I) .EQ. 13)) GO TO 1030
                IF ((M3(I) .EQ. 14) .OR. (M3(I) .EQ. 15)) GO TO 1030
@@ -401,6 +421,8 @@ C              SPECTRUM LOADING RANDOM SEQUENCE GENERATION PROGRAM
  1060       FORMAT ( 5X, 'GUST ALLEVIATION FACTOR = ',F9.6, 5X,
      1      'A-BAR = ', F16.6)
  1070    ABC(I) = TCDMGM
+         write(8,*) 'end cycle 1070'
+         close(9)
  1080    IF (I4. EQ. 0) GO TO 1615
          CUMDMG = 0.0
          CUMXN = 0.0
@@ -413,6 +435,7 @@ C              SPECTRUM LOADING RANDOM SEQUENCE GENERATION PROGRAM
          K4 = 0
          K5 = 0
          DO 1160 I = 1, KEND
+            write(8,*) 'start cycle 1160'
             IF (N6(I) -1)1160,1130,1090
  1090       IF (K4 - 0)1110,1110,1100
  1100       IF (K5 -0)1110,1110,1120
@@ -430,6 +453,7 @@ C              SPECTRUM LOADING RANDOM SEQUENCE GENERATION PROGRAM
             JI(K) = CYCLSM(I,J)
             K4 = K
  1160    CONTINUE
+         close(8)
          IF (IW1 .EQ.2) GO TO 1200
          WLPRNT = 1.0
          WRITE (6,100) IRR, ICASE
@@ -452,6 +476,7 @@ C              SPECTRUM LOADING RANDOM SEQUENCE GENERATION PROGRAM
          IF (JSUM .GE. NEND) GO TO 1300
 C     SORT MAX ARRAY INTO DESCENDING ORDER.
          DO 1240 J = I, K5
+            write(8,*) 'start cycle 1240'
             IF (QMAX(I) .GE. QMAX(J)) GO TO 1240
             ST = QMAX(J)
             QMAX(I) = QMAX(J)
@@ -477,6 +502,7 @@ C     SORT MAX ARRAY INTO DESCENDING ORDER.
  1300    IF (ISUM .GE. NEND) GO TO 1390
 C     SORT MIN ARRAY INTO ASCENDING ORDER
          DO 1310 J = I, K4
+            write(8,*) 'start cycle 1310'
             IF (QMIN(I) .LE. QMIN(J)) GO TO 1310
             ST = QMIN(I)
             QMIN(I) = QMIN(J)
@@ -568,7 +594,7 @@ C     FROM S-N DATA
          IF (A .EQ. 0.0) M = M + 1
          GO TO 1430
 C     CALCULATION OF TOTAL DAMAGE INCLUDING GAG
- 1610    TODMGM = TOMGM + CUMDMG
+ 1610    TCDMGM = TCDMGM + CUMDMG
  1615    CONTINUE
          IF (IW4 . EQ. 2) GO TO 1620
          CALL SPECSM
@@ -586,7 +612,7 @@ C     CALCULATION OF TOTAL DAMAGE INCLUDING GAG
  1670    WRITE (6,1680) (I, CDMGM(I), ABC(I), I = 1, IEND)
  1680    FORMAT (9X, I2, F16.7, F16.7)
          IF (I4 .EQ. 0) GO TO 1700
-         WRITE (6,1690) CUMDMG, TODMGM
+         WRITE (6,1690) CUMDMG, TCDMGM
  1690    FORMAT (9X, 'GAG', F16.7, F16.7)
  1700    IF (I1 .EQ. 1) GO TO 90
          RETURN
@@ -698,7 +724,7 @@ C            CC  74-80  UNDUSED
             
 C           DATA ITB/'0','1','2','3','4','5','6','7','8','9',' ',
 C    1               'J','K','L','M','N','O','P','Q','R',' '/
-            DATA ITB/1H0,1H1,1H2,1H3,1H4,1H5,1H6,1H7,1H8,1H9,1H ,
+            DATA ITB/1H0,1H1,1H2,1H3,1H4,1H5,1H6,1H7,1H8,1H9,1HI,
      1               1HJ,1HK,1HL,1HM,1HN,1HO,1HP,1HQ,1HR,1H /
             DATA ITN/ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
      1               -0,-1,-2,-3,-4,-5,-6,-7,-8,-9/
@@ -905,7 +931,7 @@ C     CONVERT AND CHECK FLOATING EXPONENET
   310          N1 = ITN(K)
                N3 = ISIGN( 10 * IABS( N1 ) + N2, N1 )
 
-  320          write(7,*)'320, N1,N2,N3',N1,N2,N3
+  320          write(7,*)'320, N1,N2,N3,K',N1,N2,N3,K
                IF  (N3 .LT. (-60)  .OR.  (N3 .GT. 70))  GO TO 380
 
 C     CONVERT VALUE (N) TO FLOATING POINT (USING EXPONENT)
@@ -938,7 +964,7 @@ C     SET ERROCODE
   460       NER = NER + 1
             NER1 = .TRUE.
             IF (REFRUN .AND. CASENO .EQ. 0) NER2 = .TRUE.
-            write(7,*) 'NER,NER1,NER2',NER,NER1,NER2
+            write(7,*) 'NER,NER1,NER2,K',NER,NER1,NER2,K
 
 C     WRITE ERROR MESSAGES
 
@@ -1073,11 +1099,11 @@ C     TERMINATE WHEN ALL DATA HAS BEEN READ
             EQUIVALENCE (IEND, X(1)), (KEND, X(2)), (I4, X(3)),
      1      (SIGULT, X(4)), (WAREA, X(5)), (ISTRES, X(6)), 
      2      (DELT1, X(46)), (TAB1, X(71)), (TAB2, X(96)), 
-     3      (TAB3, X(121)),  (TAB4, X(146)), (TA85, X(171)), 
+     3      (TAB3, X(121)),  (TAB4, X(146)), (TAB5, X(171)), 
      4      (AC, X(196)), (IW1, X(197)), (IW2, X(198)), (IW3, X(199)),
      5      (IW4, X(200)),	(IRR, X(201)), (ICASE, X(202)), 
      6      (IW5,	X(203)), (TAB6,	X(206)), (DELT2, X(231)), 
-     7      (DELY1, X(256)), (DELY11, X(296)), (ARINO1, X(336)), 
+     7      (DELY1, X(256)), (DELY11, X(296)), (ARNO1, X(336)), 
      8      (ARNO2, X(376)), (ARNO3, X(416)), (SGMAX1, X(456)), 
      9      (SGMAX2, X(496)), (SGMAX3, X(536)), (T, X(576)), 
      A      (AKSIG, X(616)), (SLOPE, X(656)), (VELOS, X(696)), 
@@ -1183,6 +1209,7 @@ C     TERMINATE WHEN ALL DATA HAS BEEN READ
   310       FORMAT ('THE FOLLOWING DATA IS INPUT DATA')
   320       FORMAT ('STRESS TABLES, S = X = F(Y). LL 1 = NO. OF Y '
      1      'ENTRIES LL 2 - 16 = Y VALUES, LL 17-31 = X VALUES')
+         write(9,*) 'in prn1',X(201),int(X(201)),IRR
             WRITE (6,310)
             DO 323 I = 1, IEND
                IF ((M3(I) .NE. 14) .AND. (M3(I) .NE. 15)) GO TO 325
@@ -1216,6 +1243,9 @@ C     TERMINATE WHEN ALL DATA HAS BEEN READ
             GO TO 350
   340       WRITE (6,10) IRR, ICASE
             WRITE (6,310)
+         write(9,*) 'in prn2',X(201),int(X(201)),IRR
+         !close(9)
+
             DO 343 I = 1, IEND
                IF ((M3(I) .NE. 14) .AND. (M3(I) .NE. 15)) GO TO 345
   343       CONTINUE
@@ -1856,7 +1886,7 @@ C           DIMENSION NS(NFT), IF1(NST), IF2(NST), N(*), NF(NFT),  ! PSV
             LINE = 60
    10       FORMAT ('INF1F2',13I7)
    20       FORMAT ('INF1F2',10F12.2)
-            IF (IP1 .GT.0) GO TO 30
+            IF (IPI .GT.0) GO TO 30
 C*********  READ IN AND PRINT ALL PEAK LEVELS(IPI) 0
             READ (5,*) (PI(I), I = 1, NPI)
             GO TO 50
