@@ -36,14 +36,14 @@ C***  DOUBLE PRECISION DATA
          EQUIVALENCE (IEND, X(1)), (KEND, X(2)), (I4, X(3)),
      1   (SIGULT, X(4)), (WAREA, X(5)), (ISTRES, X(6)), (DELT1, X(46)),
      2   (TAB1, X(71)), (TAB2, X(96)), (TAB3, X(121)), (TAB4, X(146)),
-     3   (TAB5, X(171)), (AC, X(156)), (IW1, X(197)), (IW2, X(198)),
+     3   (TAB5, X(171)), (AC, X(196)), (IW1, X(197)), (IW2, X(198)),
      4   (IW3, X(199)), (IW4, X(200)), (IRR, X(201)), (ICASE, X(202)),
      5   (IW5, X(203)), (TAB6, X(206)), (DELT2, X(231)), 
      6   (DELY1, X(256)), (DELY11, X(296)), (ARNO1, X(336)), 
      7   (ARNO2, X(376)), (ARNO3, X(416)), (SGMAX1, X(456)), 
      8   (SGMAX2, X(496)), (SGMAX3, X(536)), (T, X(576)), 
      9   (AKSIG, X(616)), (SLOPE, X(656)), (VELOS, X(696)), (WT, 
-     A   X(737)), (P1, X(776)), (TBLM2, X(853))
+     A   X(736)), (P1, X(776)), (TBLM2, X(853))
          EQUIVALENCE (P2, X(1473)), (AK1, X(1513)), (AK2, X(1553)),
      1   (ABR, X(1593)), (IA, X(1633)), (M3, X(1673)), (SIG, X(1713)),
      2   (AM, X(1753)), (N, X(1793)), (NEND, X(1833)), (AL6, X(1850)),
@@ -56,7 +56,7 @@ C***  DOUBLE PRECISION DATA
      9   (TABL8, X(1312)),(TABL9, X(1337)), (DELT3, X(1362)),
      A   (DELT4, X(1387))
          EQUIVALENCE (DELT5, X(1412)), (DELT6, X(1437)), (L1, X(1462))
-         EQUIVALENCE (CBART, X(3827)), (AST, X(3838)), (YAW, X(3839)),
+         EQUIVALENCE (CBART, X(3837)), (AST, X(3838)), (YAW, X(3839)),
      1               (CYBT, X(3879)), (CYBTO,X(3919))
          REAL JX, JT, JSUM, ISLM, NEND, JI
    10    FORMAT (I3, I3)
@@ -103,7 +103,6 @@ C***  SPECTRUM LOADING RANDOM SEQUIENCE GENERATION PROGRAM
          IF (IW5 .EQ. 2) GO TO 110
          CALL PRINT
          write(9,*) 'aft prn',X(201),int(X(201)),IRR
-         close(9)
          WLPRNT = 1.0
   110    B = 0.0
          K1(1) = 0
@@ -186,7 +185,7 @@ C     SUCCESSIVE DELTA Y VALUES
   300          YMIN(J) = D*(AM(I) - AMIDY(J)) + P(I)
   310       CONTINUE
             IF (M3(I) .LT. 13) GO TO 380
-            RHOO = 0.002376
+            RHOO = 0.002378
             RHO1 = SIG(I) * RHOO
             IF (M3(I) .EQ. 14 .OR. M3(I) .EQ. 15) GO TO 380
             VAR = 32.2 * AC * SLOPE(I) * RHO1
@@ -208,6 +207,7 @@ C     SUCCESSIVE DELTA Y VALUES
      1      ' X =E14.6', 2X, 'SEG = ', I2)
   370       NSEG = I + 50
             LEVEL = J
+            write(10,*) '1 I ',I
             CALL TWOVIN (XARG, YARG, TKSIG, OUTPUT, NSEG, LEVEL)
             write(9,*) 'AKSIG ',OUTPUT
             AKSIG(I) = OUTPUT
@@ -222,21 +222,27 @@ C              CALCULATE THE CUMULATIVE CYCLES GIVEN VALUES OF DELTA Y
      1                M1
   390          CUMM(J) = T(I) * TAB1(J)
                write(9,*) '390'
+               IF (I.EQ.27 .AND. ICASE.EQ.2) write(16,*) '390',ICASE,I,CUMM(J)
                GO TO 510
   400          CUMM(J) = T(I) * TAB2(J)
                write(9,*) '400'
+               IF (I.EQ.27 .AND. ICASE.EQ.2) write(16,*) '400',ICASE,I,CUMM(J)
                GO TO 510
   410          CUMM(J) = T(I) * TAB3(J)
                write(9,*) '410'
+               IF (I.EQ.27 .AND. ICASE.EQ.2) write(16,*) '410',ICASE,I,CUMM(J)
                GO TO 510
   420          CUMM(J) = T(I) * TAB4(J)
                write(9,*) '420'
+               IF (I.EQ.27 .AND. ICASE.EQ.2) write(16,*) '420',ICASE,I,CUMM(J)
                GO TO 510
   430          CUMM(J) = T(I) * TAB5(J)
                write(9,*) '430'
+               IF (I.EQ.27 .AND. ICASE.EQ.2) write(16,*) '430',ICASE,I,CUMM(J)
                GO TO 510
   440          CUMM(J) = T(I) * TAB6(J)
                write(9,*) '440'
+               IF (I.EQ.27 .AND. ICASE.EQ.2) write(16,*) '440',ICASE,I,CUMM(J)
                GO TO 510
   450          CUMM(J) = (ARNO1(I)*EXP(-DELTAY(J)**2/
      1                   (2.0*(SGMAX1(I))**2))
@@ -245,6 +251,7 @@ C              CALCULATE THE CUMULATIVE CYCLES GIVEN VALUES OF DELTA Y
      4                 +  ARNO3(I)*EXP(-DELTAY(J)**2/
      5                   (2.0*(SGMAX3(I))**2))) *  T(I)
                write(9,*) '450'
+               IF (I.EQ.27 .AND. ICASE.EQ.2) write(16,*) '450',ICASE,I,CUMM(J)
                GO TO 510
   460          ABR(I) = (VELOS(I)*SLOPE(I)*WAREA*AKSIG(I))/(498.0*WT(I))
                write(9,*) 'I,J,ABR1,ABR2',i,j,VELOS(I),SLOPE(I),WAREA,
@@ -274,6 +281,7 @@ C              CALCULATE THE CUMULATIVE CYCLES GIVEN VALUES OF DELTA Y
      2                 +  ARNO2(I)*P2(I)*EXP(-DELTAY(J)/
      3                   (AK2(I)*ABR(I)))) * T(I)
                write(9,*) '470'
+               IF (I.EQ.27 .AND. ICASE.EQ.2) write(16,*) '470',ICASE,I,CUMM(J)
                GO TO 510
   480          STSMXM(I,J) = TABL1(J)
                STSMNM(I,J) = TABL2(J)
@@ -323,7 +331,7 @@ C     SELECTION IS MADE BY ISTRES FLAG.
 C     SUBROUTINE ONEVAR- GIVEN A VALUE OF RESPONSE Y, INTERPOLATE IN
 C     STRESS TABLES FOR A VALUE OF STRESS
                NSEGNM = I
-               CALL ONEVAR (ARGUMNT, TBLLD, OUTPUT, NSEGNM)
+               CALL ONEVAR (ARGUMT, TBLLD, OUTPUT, NSEGNM)
   580          GO TO(590,600), NFLAG
   590          STSMXM(I,J) = OUTPUT
                write(9,*) '590, I, STSMXM',I,STSMXM
@@ -365,7 +373,7 @@ C     FORM INTERPOLATING ARGUMENTS TO CALULATE CYCLES TO FAILURE
 C     FROM S-N DATA
   720          IF (IA(I) - 6) 740,740,730
   730          IF ((IA(I) .GT. 12) .AND. (IA(I) .LT. 19)) GO TO 750
-  740          XARG = (STSMXM(I,J) / SIGLLT)
+  740          XARG = (STSMXM(I,J) / SIGULT)
                IF (IA(I) - 6) 760,760,770
   750          XARG = ((STSMXM(I,J) - STSMNM(I,J)) / (2.0 * SIGULT))
                IF (IA(I) -18) 770,770,780
@@ -395,6 +403,7 @@ C     FROM S-N DATA
 C     SUBROUTINE TWOVIN - LINEAR - QUADRATIC INTERPOLATION OF S-N DATA.
 C     GIVEN THE INTERPOLATING VALUES XARG AND YARG, INTERPOLATE FOR A
 C     VALUE OF CYCLES TO FAILURE.
+               write(10,*) '2 I ',I
                CALL TWOVIN (XARG, YARG, TBLSN, OUTPUT, NSEG, LEVEL)
   850          GO TO (860,870,880,890,900,910), ICALL
   860          ALIFE = AL1
@@ -607,10 +616,11 @@ C     FROM S-N DATA
          A = 1.0
          GO TO 1520
  1510    JX(L) = JX(L) - JI(M)
-         AN = JI(M)
+         XN = JI(M)
          A = 0.0
  1520    CUMXN = CUMXN + XN
-         B = 120
+         B = 1.0
+         GO TO 120
  1530    ALIFE = ALOG10(ALIFE)
          IF (OUTPUT - ALIFE)1560,1540,1540
  1540    DMG = 0.0
@@ -660,28 +670,28 @@ C     CALCULATION OF TOTAL DAMAGE INCLUDING GAG
          IF (I4 .EQ. 0) GO TO 1700
          WRITE (6,1690) CUMDMG, TCDMGM
  1690    FORMAT (9X, 'GAG', F16.7, F16.7)
- 1700    IF (I1 .EQ. 1) GO TO 90
+ 1700    IF (II .EQ. 1) GO TO 85  ! PSV 90 -> 85
          RETURN
       END
 
       BLOCK DATA
          COMMON /TABB/TKSIG
          DIMENSION TKSIG(257)
-         DATA TKSIG   /15.0,10.0,20.0,30.0,40.0,50.0,70.0,100.0,  8
+         DATA TKSIG   /15.0,10.0,20.0,30.0,40.0,50.0,70.0,100.0,
      1   150.0,300.0,500.0,1000.0,0.0,0.0,0.0,0.0,15.0,6.0,10.0,14.0,  
      2   18.0,22.0,30.0,40.0,60.0,80.0,100.0,120.0,140.0,160.0,180.0,   
      3   240.,2.954,2.69,2.515,2.295,2.162,1.972,1.82,1.622,1.514,1.413, 
      4   1.349,1.289,1.259,1.231,1.162,3.8,3.59,3.31,3.02,2.82,2.514,  
-     5   2.19,1.884,1.719,1.597,1.48,1.413,1.35,1.363,1.202,4.22,4.075,  
+     5   2.19,1.884,1.719,1.597,1.48,1.413,1.35,1.303,1.202,4.22,4.075, ! PSV 1.363 -> 1.303
      6   3.8,3.51,3.315,2.95,2.632,2.19,1.998,1.82,1.68,1.604,1.513, 
      7   1.446,1.319,4.46,4.36,4.14,3.8,3.635,3.275,2.884,2.51,2.29,  
      8   2.02,1.862,1.74,1.7,1.64,1.48,4.68,4.63,4.36,4.15,3.98,3.55, 
-     9   3.16,2.755,2.483,2.24,2.09,1.95,1.862,1.78,1.82,5.012,5.065,  
+     9   3.16,2.755,2.483,2.24,2.09,1.95,1.862,1.78,1.62,5.012,5.065,  
      A   4.9,4.67,4.46,4.07,3.63,3.16,2.85,2.63,2.4,2.24,2.09,1.995,1.8,
      B   5.346, 5.52,5.5,5.37,5.14,4.67,4.26,3.72,3.35,3.02,2.755,
-     C   2.6322,514.,2.345,2.09,5.624,6.026,6.05,6.03,5.89,5.63,5.14,
-     D   4.52,4.07,3.645,3.39,3.125,2.92,2.758,2.458,6.026,6.457,6.748,
-     E   6.903,6.915,6.839,6.607,5.95,5.37,4.9,4.56,4.26,4.07,3.8,3.315,
+     C   2.632,2.514,2.345,2.09,5.624,6.026,6.05,6.03,5.89,5.63,5.14,
+     D   4.52,4.07,3.645,3.39,3.125,2.92,2.758,2.458,6.026,6.457,6.748,  ! PSV 6.748 -> 6.746
+     E   6.903,6.919,6.839,6.607,5.95,5.37,4.9,4.56,4.26,4.07,3.8,3.315,
      F   6.096,6.684,6.919,7.228,7.328,7.345,7.245,6.887,6.457,5.95,
      G   5.63,5.25,5.01,4.74,4.16,6.166,6.839,7.145,7.413,7.586,7.727,
      H   7.763,7.586,7.379,7.079,6.808,6.562,6.309,6.03,5.31,60*0.0/
@@ -767,7 +777,8 @@ C            CC  74-80  UNDUSED
      1                L(4)
 
             EQUIVALENCE (AN,N)
-            
+            !SAVE CASENO, CASNUM, REFNO, REFNUM, REFRUN
+
 C           DATA ITB/'0','1','2','3','4','5','6','7','8','9','-',
 C    1               'J','K','L','M','N','O','P','Q','R',' '/
             DATA ITB/1H0,1H1,1H2,1H3,1H4,1H5,1H6,1H7,1H8,1H9,1H ,
@@ -785,7 +796,12 @@ C   10       FORMAT (I1, 4(I5, A1, I8, 2A1), 3X, I2, I3)
             NER1 = .FALSE.
             NER2 = .FALSE.
             NER3 = .FALSE.
-
+            REFRUN = .FALSE.   ! PSV
+            CASNUM = 0  ! PSV
+            CASENO = 0  ! PSV
+            REFNO = 0  ! PSV
+            REFNUM = 0  ! PSV
+            write(7,*) 'Start'
 C     SET PRINT FOR PAGE EJECT, CHECK NUMBER OF ARGUMENTS
             KKKK = 2
 
@@ -797,14 +813,15 @@ C     PAGE EJECT NOT WANTED. SET PRINT FOR SINGLE SPACE, CHECK KP
 
 C     TEST ENTRY FLAG
    50       IF (ENTRY1 .EQ. -1) GO TO 470
+            write(7,*) 'Aft 50'
             NER = 0
             IF (ENTRY1 .EQ. 2) GO TO 60
             IF (ENTRY1 .NE. 0) GO TO 200
    60       REFRUN = .FALSE.
+            write(7,*) 'Aft 60'
 
             IF (NCASE .GT. 0) REFRUN = .TRUE.
             NLL=IABS(NCASE)
-            write(10,*) 'Entry1: ',ENTRY1
             IF (ENTRY1 .EQ. 2) GO TO 190
 
    70       read(5,'(a80)') line
@@ -819,6 +836,7 @@ C     TEST ENTRY FLAG
 !     1                  I=1, 4), REFNO, CASENO
 !            WRITE(7,*) IC1, (L(I), IS(I), IV(I), IE1(I), IE2(I),
 !     1                  I=1, 4), REFNO, CASENO
+            write(7,*) 'Aft 70 LOC',LOC
             IF ((REFNO .EQ. 99) .AND. (CASENO .EQ. 999)) NER3 = .TRUE.
             IF (ENTRY1 .EQ. 0) GO TO 190
             IF (CASNUM .NE. 0) GO TO 80
@@ -849,11 +867,13 @@ C     RESET ERROR FLAG1 AND TEST FRO RESETTING ERROR FLAG2
 
   100       IF (NER2 .AND. (REFNO - REFNUM) .NE. 0) NER2 = .FALSE.
             NER1 = .FALSE.
+            write(7,*) 'Aft 100'
             GO TO 50
 
 C     TEST FOR REFERENCE RUN DATA AND ARRAY
 
   110       IF (REFNO .EQ. 0) GO TO 120
+            write(7,*) 'Aft 110'
             IF (.NOT. REFRUN) GO TO 440
             GO TO 150
 
@@ -861,6 +881,7 @@ C     SET CASE ARRAY TO ZERO (NO REFERENCE RUN DATA)
 
   120       DO 130 I = 1, NLL
   130       CASE(I) = 0.0
+            write(7,*) 'Aft 120'
             REFNUM = 0.0
             GO TO 180
 
@@ -874,6 +895,7 @@ C     MOVE REFERENCE RUN ARRAY INTO CASE ARRAY
   170       write(7,*) '170 REFNUM, REFNO', REFNUM, REFNO
             IF (REFNUM .NE. REFNO) GO TO 440
   180       CASNUM = CASENO
+            write(7,*) 'Aft 180'
             GO TO 220
 
 C     INITIAL ENTRY (ENTRY1 = 0 OR 2)
@@ -886,6 +908,7 @@ C     INITIAL ENTRY (ENTRY1 = 0 OR 2)
 C     TEST REFRENCE RUN AND CASE NUMBERS (NORMAL REENTRY)
 
   200       IF (CASENO .NE. 0) GO TO 110
+            write(7,*) 'Aft 200'
             IF (REFNO .EQ. 0) GO TO 450
             IF ( .NOT. REFRUN) GO TO 440
 
@@ -898,10 +921,12 @@ C     CHECK FOR OVERLAY FLAN (AND IF NOT, SET REFERENCE RUN ARRAY = 0)
             IF (ENTRY1 .EQ. 3) GO TO 220
             DO 210 I = 1,NLL
   210       RRAREA(I) = 0.0
+            write(7,*) 'Aft 210'
 
 C     RESET ENTRY FLAG AND TEST COLUMN ONE OF DATA CARD
 
   220       ENTRY1 = 1
+            write(7,*) 'Aft 220'
 
 C     CONVERT, CHECK, AND (IF CORRECT) STORE 4 ETS OF DATA FIELDS
                J = LOC
@@ -917,6 +942,7 @@ C     STORE ANSWER IN LOATION J OF REGERENCE RUN OR CASE ARRAYS
                CASE(J) = AN
                GO TO 350
   340          RRAREA(J) = AN
+            write(7,*) 'Aft 340'
   350       CONTINUE
             GO TO 70
 
@@ -938,344 +964,6 @@ C     SET ERROCODE
 C     WRITE ERROR MESSAGES
             IF (NER3) GO TO 470
             WRITE (6,20) NER, IC1, (LOC, ' ', N, ' ',' ',
-     1                   I = 1, 4), REFNO, CASENO
-            NER = 0
-            GO TO 70
-
-C     TERMINATE WHEN ALL DATA HAS BEEN READ
-
-  470       WRITE (6,40)
-            RETURN
-         END
-
-
-         SUBROUTINE NPUT1A (CASE, NCASE, RAREA, IENTRY, IREF, ICAS, KP)
-C     DECK NPUT
-C
-C     NPUT1A - STANDARD DATA INPUT
-C
-C     THIS SUBROUTINE READS A STANDARD DATA FORM (VAIRABLE NUMBER OF
-C       CARDS WITH UP TO FOUR VALUES PER CARD) AND STORES VALUES
-C       (INTEGER AND/OR REAL) INTO AN ARBITRARY LENGTH ARRAY.  A
-C       PROCEDURE FOR EITHER REPLACIING OR UPDATING REFERENCE RUN
-C       ARRAYS IS ALSO PROVIDED.
-
-C       CASE   = OUTPUT = A LINER ARRAY (SEE Y) CONTAINING THE DATA
-C                        READ FROM CARDS
-C       NCASE  = IN-OUT = THE UPPER LIMIT OF THE CASE ARRAY
-
-C       RRAREA = OUT-IN = A REFERENCE RUN ARRAY (OF THE SAME LENGTH
-C                        AS CASE) IF RRAREA IS NOT EQUIVALENT TO
-C                        CASE.  THE SUBROUTINE SAVES DATA IN THIS
-C                        AREA BETWEEN CALLS.  IF RRAREA IS
-C                        EQUIVALENCED TO CASE, THEN RRAREA IS NOT
-C                        USED AND THERE CONNOT BE ANY REFERENCE RUN
-C                        DATA
-
-C       IENTRY  = I-OUT = ENTRY FLAG (INTEGER)
-C                       =  0  INITITAL ENTRY ONLY (INPUT)
-C                       =  2  NEW ENTRY ONLY (INPUT) TO CHANGE CASE,
-C                                Y, AND/OR RRAREA.  NO INFORMATION
-C                                IS SAVED FROM PREVIOUS CASE OR
-C                                RAREA ARRAYS.
-C                       =  3  OVERLAY RRAREA (INPUT). PERMITS
-C                               OVERLAYING OF REFERENCE RUN DATA
-C                       =  1  NORMAL OUTPUT FLAG (OUTPUT)
-C                       = -1  LAST CASE FLAG (OUTPUT).  THE NEXT
-C                               ENTRY TO THE SUBROUTINE WILL
-C                               TERMINATE YOUR JOB.
-
-C       IREF    = OUTPUT = REFERENCE RUN NUMBER (INTEGER) TAKEN FROM
-C                         INPUT CARDS
-
-C       ICAS    = OUTPUT = CASE NUMBER (INTEGER) TAKEN FROM DATA CARDS
-C
-C       KP      = INPUT  = OPTIONAL PRINT CODE (INTEGER)
-C                           IF KP IS NOT IN ARGUMENT LIST, IT IS
-C                           TREATED AS IF KP = 0
-C                        = C   EJECT PAGE FOR EACH NEW DATA CASE
-C                        = L   SINGLE SPACE FORE EACH NEW DATA CASE
-C                        = ANYTHING ELSE - NO PRINTING AT ALL
-
-C       THIS ROUTINE USES ZZL1 AND ARGQ
-C                       THE IABS AND ISIGN FUNCTIONS
-
-C       FORTRAN UNIT 5 IS READ (FOR DATA)
-C       FORTRAN UNIT 6 MAY BE WRITE (SEE INPUT PARAMETER KP) WITH
-C         REFERENCE RUN AND CASE NUMBERS AT THE TOP OF A NEW PAGE (OR
-C         AFTER ONE BLANK LINE) AFTER EACH EXECUTED CALL STATEMENT.
-C         ERROR MESSAGES MAY ALSO BE WRITTEN.
-
-C      CARD FORM IS
-C            CC  1    MUST CONTAIN A 1
-C            CC  2-6, 18-22, 34-38, 50-54,    LOCATION FIELDS
-C            CC  7-15, 23-31, 39-47, 55-63    FRACTION FIELDS
-C            CC  16-17, 32-33, 48-49, 64-65   EXPONENT FIELDS
-C            CC  66-68  UNDUSED
-C            CC  69-70  REFERENCE RUN NUMBER
-C            CC  71-73  CASE NUMBER
-C            CC  74-80  UNDUSED
-
-            INTEGER CASENO, CASNUM, ENTRY1, REFNO, REFNUM
-
-            LOGICAL NER1, NER2, NER3, REFRUN
-
-            DOUBLE PRECISION A
-
-            DIMENSION CASE(1), RRAREA(1)
-            DIMENSION ITB(21), ITN(20), IE1(4), IE2(4), IS(4), IV(4), 
-     1                L(4)
-
-            EQUIVALENCE (AN,N)
-            
-C           DATA ITB/'0','1','2','3','4','5','6','7','8','9','-',
-C    1               'J','K','L','M','N','O','P','Q','R',' '/
-            DATA ITB/1H0,1H1,1H2,1H3,1H4,1H5,1H6,1H7,1H8,1H9,1H ,
-     1               1HJ,1HK,1HL,1HM,1HN,1HO,1HP,1HQ,1HR,1H /
-            DATA ITN/ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
-     1               -0,-1,-2,-3,-4,-5,-6,-7,-8,-9/
-            DATA IX/1HX /
-
-C   10       FORMAT (I1, 4(I5, A1, I8, 2A1), 3X, I2, I3)
-   20       FORMAT ('ER', I2, 5X I1, 4(I5, A1, I8, 2A1), 3X, I2, I3)
-   30       FORMAT (A1, 'REFERENCE RUN NO.', I3, 4X, 'CASE NO.', I4)
-   40       FORMAT ('NO MORE INPUT1 DATA...JOB TERMINATED BY INPUT1.')
-
-            ENTRY1 = IENTRY
-            NER1 = .FALSE.
-            NER2 = .FALSE.
-            NER3 = .FALSE.
-
-C     DETERMINE NUMBER OF ARGUMENTS IN CALL STATEMENT
-
-C***  CALL ARGQO ( N )
-
-C     SET PRINT FOR PAGE EJECT, CHECK NUMBER OF ARGUMENTS
-
-            KKKK = 2
-C***  IF (N .LT. 7) GO TO 50
-
-C     KP INCLUDED.  CHECK FOR PAGE EJECT
-
-            IF (KP .EQ. 0) GO TO 50
-
-C     PAGE EJECT NOT WANTED. SET PRINT FOR SINGLE SPACE, CHECK KP
-
-            KKKK = 21
-            IF (KP .NE. 1) KKKK = 50
-
-C     TEST ENTRY FLAG
-
-   50       IF (ENTRY1 .EQ. -1) GO TO 470
-            NER = 0
-            IF (ENTRY1 .EQ. 2) GO TO 60
-            IF (ENTRY1 .NE. 0) GO TO 200
-   60       REFRUN = .FALSE.
-
-C     CHECK FOR NO REFERENCE RUN ARRAY
-
-C***  CALL ZZL1 (CASE, RRAREA, LDC, LBDD, N)
-C***  IF (LADD .NE. LBDC) REFRUN = .TRUE.
-C***  CALL ZZL1 (CASE, Y, LADD, LBDD, N)
-C***  NLL = N
-            IF (NCASE .GT. 0) REFRUN = .TRUE.
-            NLL=IABS(NCASE)
-            IF (ENTRY1 .EQ. 2) GO TO 190
-
-   10       FORMAT (I1, 4(I5, A1, I8, 2A1), 3X, I2, I3)
-   70       READ (5,10) IC1, (L(I), IS(I), IV(I), IE1(I), IE2(I),
-     1                  I=1, 4), REFNO, CASENO
-            WRITE(7,*) IC1, (L(I), IS(I), IV(I), IE1(I), IE2(I),
-     1                  I=1, 4), REFNO, CASENO
-            IF ((REFNO .EQ. 99) .AND. (CASENO .EQ. 999)) NER3 = .TRUE.
-            IF (ENTRY1 .EQ. 0) GO TO 190
-            IF (CASNUM .NE. 0) GO TO 80
-            IF (CASENO .NE. 0) GO TO 140
-            IF ( REFNUM .NE. REFNO) GO TO 460
-            GO TO 110
-
-C     TEST FOR END OF CURRENT CASE
-
-   80       write(7,*) '80 CASNUM,CASENO',CASNUM,CASENO
-            IF (CASNUM .EQ. CASENO) GO TO 170
-            IF (NER3) ENTRY1 = -1
-
-C     CHECK FOR PAST ERRORS
-
-            IF (NER1 .OR. NER2) GO TO 100
-
-C     PRINT (IF KP = 0 OR 1) OUTPUT TITLE AND EXIT FROM SUBROUTINE
-
-            IF (KKKK .GT. 40) GO TO 90
-            write(7,*) 'bef 90'
-            WRITE (6,30) ITB(KKKK), REFNUM, CASNUM
-   90       IREF = REFNUM
-            ICAS = CASNUM
-            IENTRY = ENTRY1
-            RETURN
-
-C     RESET ERROR FLAG1 AND TEST FRO RESETTING ERROR FLAG2
-
-  100       IF (NER2 .AND. (REFNO - REFNUM) .NE. 0) NER2 = .FALSE.
-            NER1 = .FALSE.
-            GO TO 50
-
-C     TEST FOR REFERENCE RUN DATA AND ARRAY
-
-  110       IF (REFNO .EQ. 0) GO TO 120
-            IF (.NOT. REFRUN) GO TO 440
-            GO TO 150
-
-C     SET CASE ARRAY TO ZERO (NO REFERENCE RUN DATA)
-
-  120       DO 130 I = 1, NLL
-  130       CASE(I) = 0.0
-            REFNUM = 0.0
-            GO TO 180
-
-C     MOVE REFERENCE RUN ARRAY INTO CASE ARRAY
-
-  140       write(7,*) '140'
-            CASNUM = CASENO
-  150       DO 160 I = 1, NLL
-  160       CASE(I) = RRAREA(I)
-
-  170       write(7,*) '170 REFNUM, REFNO', REFNUM, REFNO
-            IF (REFNUM .NE. REFNO) GO TO 440
-  180       CASNUM = CASENO
-            GO TO 220
-
-C     INITIAL ENTRY (ENTRY1 = 0 OR 2)
-
-  190       write(7,*) '190'
-            ENTRY1 = 1
-            REFNUM = -1
-            CASNUM = -1
-
-C     TEST REFRENCE RUN AND CASE NUMBERS (NORMAL REENTRY)
-
-  200       IF (CASENO .NE. 0) GO TO 110
-            IF (REFNO .EQ. 0) GO TO 450
-            IF ( .NOT. REFRUN) GO TO 440
-
-C     SET UP REFERENCE RUN AND CASE NUMBER OF NEW REFERENCE RUN
-
-            REFNUM = REFNO
-            CASNUM = 0
-C     CHECK FOR OVERLAY FLAN (AND IF NOT, SET REFERENCE RUN ARRAY = 0)
-
-            IF (ENTRY1 .EQ. 3) GO TO 220
-            DO 210 I = 1,NLL
-  210       RRAREA(I) = 0.0
-
-C     RESET ENTRY FLAG AND TEST COLUMN ONE OF DATA CARD
-
-  220       ENTRY1 = 1
-            IF (IC1 .NE. 1) GO TO 430
-
-C     CONVERT, CHECK, AND (IF CORRECT) STORE 4 ETS OF DATA FIELDS
-
-            DO 350 I = 1, 4
-               J = L(I)
-               JS = IS(I)
-               JV = IV(I)
-
-C     CHECK SIGN FIELD (AND IF BLANK, SKIP TO NEXT SET OF FIELDS)
-
-               write(7,*) '1 check JS', JS, ITB(21)
-               IF (JS .EQ. ITB(21)) GO TO 350
-               write(7,*) 'aft check JS'
-
-C     TEST LOCATION FOR VALID RANGE
-
-               IF (J .LE. 0) GO TO 370
-               IF (J .GT. NLL) GO TO 360
-
-C     FIND AND CHEDK SIGN FIELD VALUE
-
-               K = 1
-  230          IF (JS .EQ. ITB(K)) GO TO 240
-               K = K + 1
-               IF (K .NE. 21) GO TO 230
-               GO TO 400
-
-C     CHECK FOR VALID VALUE FIELD - CONVERT AND STORE SIGN AND VALUE
-
-  240          write(7,*) '240 K,JV',K,JV
-               IF (JV .LT. 0) GO TO 390
-               IF ( K. NE. 11) GO TO 250
-               N = -JV
-               GO TO 260
-  250          N = ITN(K)
-               N = ISIGN(100000000 * IABS(N) + JV, N)
-
-C     CHECK EXPONENT FOR FLOATING POINT
-
-  260          IF ((IE1(I) .EQ. IX) .AND. (IE2(I) .EQ. IX))
-     1            GO TO 330
-               write(7,*) 'aft 260 N',N
-
-C     CONVERT AND CHECK FLOATING EXPONENET
-
-               K = 1
-  270          IF (IE2(I) .EQ. ITB(K)) GO TO 280
-               K = K + 1
-               IF (K .EQ. 21) GO TO 420
-               GO TO 270
-  280          write(7,*) '280 K,IE2(I)',K,IE2(I)
-               N2 = ITN(K)
-               IF (K .GT. 10) GO TO 410
-
-               K = 1
-  290          IF (IE1(I) .EQ. ITB(K)) GO TO 300
-               K = K + 1
-               IF ( K .EQ. 21) GO TO 420
-               GO TO 290
-  300          IF (K .EQ. 11) GO TO 310
-               N3 = -N2
-               GO TO 320
-  310          N1 = ITN(K)
-               N3 = ISIGN( 10 * IABS( N1 ) + N2, N1 )
-
-  320          write(7,*)'320, N1,N2,N3,K',N1,N2,N3,K
-               IF  (N3 .LT. (-60)  .OR.  (N3 .GT. 70))  GO TO 380
-
-C     CONVERT VALUE (N) TO FLOATING POINT (USING EXPONENT)
-
-               A = N
-               AN = A * (10.0 ** (N3 - 9))
-
-C     STORE ANSWER IN LOATION J OF REGERENCE RUN OR CASE ARRAYS
-  330          write(7,*)'I,J,CASENO,AN ',I,J,CASENO, AN
-99330          IF (CASENO .EQ. 0)  GO TO 340
-               CASE(J) = AN
-               GO TO 350
-  340          RRAREA(J) = AN
-               write(7,*) '911'
-  350       CONTINUE
-            GO TO 70
-
-C     SET ERROCODE
-
-  360       NER = NER + 2
-  370       NER = NER + 2
-  380       NER = NER + 2
-  390       NER = NER + 1
-  400       NER = NER + 1
-  410       NER = NER + 1
-  420       NER = NER + 1
-  430       NER = NER + 2
-  440       NER = NER + 1
-  450       NER = NER + 1
-  460       NER = NER + 1
-            NER1 = .TRUE.
-            IF (REFRUN .AND. CASENO .EQ. 0) NER2 = .TRUE.
-            write(7,*) 'NER,NER1,NER2,K',NER,NER1,NER2,K
-
-C     WRITE ERROR MESSAGES
-
-            IF (NER3) GO TO 470
-            WRITE (6,20) NER, IC1, (L(I), IS(I), IV(I), IE1(I), IE2(I),
      1                   I = 1, 4), REFNO, CASENO
             NER = 0
             GO TO 70
@@ -1873,6 +1561,7 @@ C        OUTPUT = INTERPOLATED VALUE OF Z = F(X,Y)
   150       FORMAT ('GUST ALLEV. INTRP. ERROR. X IS TOO LARGE',
      1      'X = ',E14.6,2X,'Y IS TOO LARGE. Y = ',E14.6,1X,'SEG =', 
      2      I3)
+            write(10,*) 'tw: ',XARG, YARG, TABLE, OUTPUT, NSEG, LEVEL
             J5 = 0
             K = 0
             NER = 0
@@ -1903,6 +1592,7 @@ C        OUTPUT = INTERPOLATED VALUE OF Z = F(X,Y)
   260          IF (TABLE (IY + 1) - YARG) 280,310,310
   270          CYINT = ((YARG - TABLE(IY + 1)) / (TABLE(IY + 2) - 
      1                   TABLE(IY + 1)))
+               IF (CYINT - 0.001) 250,300,300
   280          CYINT = ((YARG - TABLE(IY + 1)) / (TABLE(IY +1) - 
      1                   TABLE(IY)))
   290          IF (CYINT - 0.001) 310,300,300
@@ -1978,7 +1668,7 @@ C        OUTPUT = INTERPOLATED VALUE OF Z = F(X,Y)
             EX = ALOG10(TABLE(IN)) + BX * (ALOG10(TABLE(IN + 16)) -
      1      ALOG10(TABLE(IN)))
             FX = TABLE(IX + 17) - TABLE(IX + 16) + BX * (TABLE(IX + 18) 
-     1           - 2.0) * (TABLE (IX + 17) + TABLE(IX + 16))
+     1           - 2.0 * TABLE (IX + 17) + TABLE(IX + 16))
             IF (FX .EQ. 0.0) FX = 1.0
             OUTPUT = ALOG10(TABLE(IN)) + BX * (ALOG10(TABLE(IN + 16)) -
      1      ALOG10(TABLE(IN))) + (((CX) * (DX - EX)) / (FX))
@@ -1986,6 +1676,7 @@ C        OUTPUT = INTERPOLATED VALUE OF Z = F(X,Y)
             GO TO 710
   600       IF (J5 - 1) 620,610,620
   610       BX = 0.0
+            GO TO 630
   620       BX = ((YARG - TABLE(IY)) / (TABLE(IY + 1) - TABLE(IY)))
   630       IF (IX - NXENTR) 650,650,640
   640       AN7 = ALOG10(TABLE(IN + 15))
@@ -2022,11 +1713,11 @@ C        OUTPUT = INTERPOLATED VALUE OF Z = F(X,Y)
             IF (NSEG .GT. 50) GO TO 730
             IF (NER .EQ. 2) WRITE(6,10) YARG, NSEG, LEVEL
             IF (NER .EQ. 3) WRITE(6,20) YARG, NSEG, LEVEL
-            IF ((NER .EQ. 5) .AND. (NER 2 .EQ. 0)) WRITE(6,30) YARG, 
+            IF ((NER .EQ. 5) .AND. (NER2 .EQ. 0)) WRITE(6,30) YARG, 
      1         NSEG, LEVEL
-            IF ((NER2 .EQ. 12) .AND. (NER 5 .EQ. 13)) WRITE(6,40) YARG, 
+            IF ((NER2 .EQ. 12) .AND. (NER5 .EQ. 13)) WRITE(6,40) YARG, 
      1         NSEG, LEVEL
-            IF ((NER2 .EQ. 13) .AND. (NER 5 .EQ. 13)) WRITE(6,50) YARG, 
+            IF ((NER2 .EQ. 13) .AND. (NER5 .EQ. 13)) WRITE(6,50) YARG, 
      1         NSEG, LEVEL
             GO TO 760
   720       IF (NER .EQ. 2) WRITE(6,60) YARG, XARG
@@ -2064,28 +1755,28 @@ C*********         DIMENSIONS OF A AND BY NSIZE.  THROUGH OUT THE
 C*********         SPECTRUM LOADING SEQUENCE GENERATION PROGRAM, CORE
 C*********         ALLOCATION IS DONE THROUGH IMPLIED EQUIVALENCES.
 C*********  SUBROUTINES CALLED - ERROR, INPUTF, NEWPG
-            DIMENSION A(28000), N(1)
+            DIMENSION A(28000), N(28000)
             EQUIVALENCE (A(1), N(1))
             COMMON NPG, TITLE(20), NSIZE, LEFT, IERR, IRS, IUIL, NPI, 
-     1             NRAN, IVP, IFI, NXY, CLIP, SLIV, FACTGOR, ELIMP, 
+     1             NRAN, IVP, IFI, NXY, CLIP, CLIV, FACTOR, ELIMP, 
      2             ELIMV, IPFS, NPSS, IPTF, IAFS, NEXT, NOW, IFRS, 
      3             MAXHP, KF, KC, A
-            REAL N 
+            !REAL N 
+            N=0
             NSIZE = 28000
             NEXT = 1
             NOW = 1
             DO 10 I = 1,20
    10       TITLE(I) = BLANK
-            write(6,*) ' 1716'
             READ (5,20) (TITLE(I), I = 1,20)
    20       FORMAT (20A4)
             NPG = 1
             CALL NEWPG
-            IERR = 1
+            IERR = 0
             READ (5,*) NFT, IRS, IFRS, IUIL, IPI, IRAN, KVP, IFI, NXY, 
-     1                 IPFS, NPSS, IPTF, IAFS, MXHP, KF, KC
+     1                 IPFS, NPSS, IPTF, IAFS, MAXHP, KF, KC
             WRITE (6,30) NFT, IRS, IFRS, IUIL, IPI, IRAN, KVP, IFI, NXY,
-     1                   IPFS, NPSS, IPTF, IAFS, MXHP
+     1                   IPFS, NPSS, IPTF, IAFS, MAXHP
    30       FORMAT (
      X      15X, 'NUMBER OF FLIGHT TYPES IS.......................', I5/
      1      15X, 'VALLEY/PEAK COUPLING IS..(1=A6PA, 2=RANDOM).....', I5/
@@ -2126,6 +1817,7 @@ C*********  SUBROUTINES CALLED - ERROR, INPUTF, NEWPG
      4       'VALUE IS.................', F10.0//)
             LEFT = NSIZE - 2 * NFT
             IF (LEFT .LT. 0) CALL ERROR (1, LEFT, NSIZE, NFT)
+            rewind iuil ! PSV
             CALL INPUTF (NFT, N(1), N(NFT+1), N(2*NFT+1), NST, IRAN, 
      1                   IPI, KVP)
             RETURN
@@ -2153,7 +1845,7 @@ C*********      AND THE TOTAL NUMBER OF SEGMENTS.
             NTF = 0
             DO 20 I = 1, NFT
                NST = NST + NS(I)
-               NSF = NTF + NF(I)
+               NTF = NTF + NF(I)
    20       CONTINUE
 C*********  CALCULATE THE STARTING POIT FOR EACH ARRAY WITHIN
 C*********  THE A ARRAY.
@@ -2166,7 +1858,7 @@ C*********  THE A ARRAY.
             MF2 = MF1 + NST
             MFRS = MF2 + NST
             MN = MFRS + (2 * IFRS)
-            LEFT = LEFT - (1 * (NST + NXY + IFRS) + IVP + NRAN + NPI + 
+            LEFT = LEFT - (2 * (NST + NXY + IFRS) + IVP + NRAN + NPI + 
      1             NPSS)
             IF (LEFT . LT. 0) CALL ERROR (1, LEFT, NSIZE, NST)
             CALL INF1F2 (NST, NFT, NS, A(MF1), A(MF2), A(MN), NF1ST, 
@@ -2185,14 +1877,13 @@ C*********  INPUT DATA.  IT SETS UP THE CORE STORAGE REQUIRED FOR  *****
 C*********  THE CALLS TO SUBROUTINES INMMN, GENFL, AND GENAFS.     *****
 C*********  SUBROUTINES CALLED - ERROR, GENAFS, GENFL, INMMN,      *****
 C*********                       NEWPG, OPENMS, WTAPE              *****
-            REAL N(*)                                              ! PSV
-C           DIMENSION NS(NFT), IF1(NST), IF2(NST), N(*), NF(NFT),  ! PSV
-            DIMENSION NS(NFT), IF1(NST), IF2(NST), NF(NFT), 
+            DIMENSION NS(NFT), IF1(NST), IF2(NST), N(*), NF(NFT), 
      1                NFRS(2,1)
-            DIMENSION PI(I), RAN(*), VP(*), XY(2,1), ISS (*)
+            DIMENSION PI(1), RAN(*), VP(*), XY(2,1), ISS (*)
             COMMON NPG, TITLE(20), NSIZE, LEFT, IERR, IRS, IUIL, NPI, 
      1             NRAN, IVP, IFI, NXY, CLIP, CLIV, FACTOR, ELIMP, 
      2             ELIMV, IPFS, NPSS, IPTF, IAFT, NEXT, NOW, IFRS
+            !write(11,*) 'NS ',NS
             LINE = 60
    10       FORMAT ('INF1F2',13I7)
    20       FORMAT ('INF1F2',10F12.2)
@@ -2202,13 +1893,14 @@ C*********  READ IN AND PRINT ALL PEAK LEVELS(IPI) 0
             GO TO 50
 C*********  READ IN AND PRINT FIRST AND LAST PEAK LEVELS.
 C*********  LET THE PROGRAM COMPUTE EVENLY SPACED VALUES.
-   30       READ (5,*) PI(I), PI(NPI)
+   30       READ (5,*) PI(1), PI(NPI)
             ND = NPI - 1
-            DEL = (PI(NPI) - PI(I)) / ND
+            DEL = (PI(NPI) - PI(1)) / ND
             DO 40 i = 2, ND
    40       PI(I) = PI(I-1) + DEL
    50       WRITE (6,60) (PI(I), I = 1, NPI)
    60       FORMAT (5X, 'PEAK LEVELS FOR SPECTRUM SUMATION' / (10F12.0))
+            write(11,*) 'NS ',NS
             IF (IRAN .GT. 0) GO TO 80
 C********* READ IN AND PRINT ALL RANGE LEVELS (IRAN) 0)
    70       READ (5,*) (RAN(I), I = 1, NRAN)
@@ -2223,6 +1915,7 @@ C*********  LET THE PROGRAM COMPUTE EVENLY SPACED VALUES.
   100       WRITE (6,110) (RAN(I), I = 1, NRAN)
   110       FORMAT (5X, 'INPUT RANGE LEVELS FOR SPECTRUM SUMMATION' /
      1      (10F12.0))
+            WRITE (11,*) 'RAN ',(RAN(I), I = 1, NRAN)
             IF (KVP .GT. 0) GO TO 120
 C********** READ IN AND PRINT ALL TEH VALLEY/PEAK RETIOS (KVP) 0)
             READ (5,*) (VP(I), I = 1, IVP)
@@ -2231,27 +1924,30 @@ C********** READ IN AND PRING FIRT AND LAST VALLEY/PEAK RATIOS.
 C********** LET THE PROGRAM COMPUTE EVELY SPACED VALUES.
   120       READ (5,*) VP(1), VP(IVP)
             ND = IVP - 1
-            DEL = (VP(IVP) - VP(I)) / ND
+            DEL = (VP(IVP) - VP(1)) / ND
             DO 130 i = 2, ND
   130       VP(I) = VP(I-1) + DEL
   140       WRITE (6,150) (VP(I), I = 1, IVP)
-  150       FORMAT (5X, 'INPUT VALLEY/PEAK RATIOS FOR SPECTRUM'
+  150       FORMAT (5X, 'INPUT VALLEY/PEAK RATIOS FOR SPECTRUM '
      1              'SUMMATION'/ 5X, 18F7.3)
-C           IF (NXY .EQ. 0) GO TO 170
+            WRITE (11,*) 'VP ',(VP(I), I = 1, IVP)
+            IF (NXY .EQ. 0) GO TO 170
 C*********** READ IN AND PRINT THE VALLEY/PEAK RATIO VS RANGE CURVE ****
             READ (5,*) ((XY(I,J), I = 1,2), J = 1, NXY)
             WRITE (6,160) ((XY(I,J), I = 1,2), J = 1, NXY)
   160       FORMAT (5X, 'INPUT VALLEY/PEAK RATIO VS RANGE CURVE FOR'
      1                  'RANGE TRUNCATION'/ 8X, 5(F7.3, F10.0, 4X) / 
      2                   8X, 5(F7.3, F10.0, 4X))
-C 170       IF (NPSS .EQ. 0) GO TO 190
+            WRITE (11,*) 'XY ',((XY(I,J), I = 1,2), J = 1, NXY)
+  170       IF (NPSS .EQ. 0) GO TO 190
 C***********  READ IN AND PRINT NUMBER OF FLIGHTS                *******
 C***********  AFTER WHICH A SPECTRUM SUMMATION IS TO BE PRINTED  *******
             READ (5,*) (ISS(I), I = 1, NPSS)
             WRITE (6,180) (ISS(I), I = 1, NPSS)
   180       FORMAT (5X, 'INPUT FLIGHT NUMBERS FOR SPECTRUM SUMMATION ' 
-     1                  'PRINT'/ (5X, 2O16))
-c 190       REWIND 3
+     1                  'PRINT'/ (5X, 20I6))
+  190       REWIND 3
+            WRITE (11,*) 'ISS ',(ISS(I), I = 1, NPSS)
 C*********** READ IN AND PRINT A6PA REFERENCDE RUN, CASE NUMBER,  ******
 C*********** AND SEGMENTS FROM TAPE UNIT 3.                       ******
             IF (LINE .LT. 55) GO TO 200
@@ -2267,9 +1963,15 @@ C*********** AND SEGMENTS FROM TAPE UNIT 3.                       ******
             DO 260 I = 1, NFT
                IS1 = IS2 + 1
                NST = NST + NS(I)
+            WRITE (11,*) 'NST,JSS ',NST,JSS
+            !close(11)
+            !open(unit=11, access='APPEND')
                IF (NST .EQ . JSS) GO TO 230
                IF (NST .LT. JSS) GO TO 240
   220          READ (3) IRR, ICASE, ISEG
+            WRITE (11,*) 'IRR, ICASE, ISEG ',IRR, ICASE, ISEG
+            !close(11)
+            !open(unit=11, access='APPEND')
                ISP = JSS
                JSS = JSS + ISEG
                IF (NST .LT. JSS) GO TO 240
@@ -2284,10 +1986,12 @@ C*********** AND SEGMENTS FROM TAPE UNIT 3.                       ******
                LINE = LINE + 1
   250          FORMAT (I8, 4X, I6, 2X, I6, 6X, 2I6)
   260       CONTINUE
+            !close(6)
+            !open(unit=6, access='APPEND')
             NF1ST = 0
             NF2ST = 0
             IS1 = 1
-            IS2 = 2
+            IS2 = 0
 C*************  READ IN AND PRINT F1 AND F2 SEGMENTS              ******
             IF (LINE .LT. 50) GO TO 270
             CALL NEWPG
@@ -2301,7 +2005,7 @@ C*************  READ IN AND PRINT F1 AND F2 SEGMENTS              ******
   280          FORMAT (4X, 'FLIGHT TYPE', I5, ' HAS', I6, ' FLIGHTS AND', 
      1                 I5, ' A6PA SEGMENTS')
                WRITE (6,290) (IF1(J), J = IS1, IS2)
-  290          FORMAT (4X, 'F1 SEGMENTS', 35I3)
+  290          FORMAT (8X, 'F1 SEGMENTS', 35I3)
                WRITE (6,300) (IF2(J), J = IS1, IS2)
   300          FORMAT (8X, 'F2 SEGMENTS', 35I3)
                MAX = 0
@@ -2310,11 +2014,16 @@ C*************  READ IN AND PRINT F1 AND F2 SEGMENTS              ******
                   IF (IF1(J) .GT. MAX) MAX = IF1(J)
                   IF (IF2(J) .GT. MBX) MBX = IF2(J)
   310          CONTINUE
-               NF1ST = MF1ST + MAX
-               MF2ST = MF2ST + MBX
+               NF1ST = NF1ST + MAX
+               NF2ST = NF2ST + MBX
                LINE = LINE + 4
+               IF (LINE.LT.51) GO TO 320
+               LINE = 4
                CALL NEWPG
   320       IS1 = IS1 + NS(I)
+            !close(6)
+            !open(unit=6, access='APPEND')
+
   330       FORMAT (1X, 5F12.2)
   340       FORMAT (1X, 'IN F1 F2', 20I6)
             IF (IFRS .EQ. 0) GO TO 360
@@ -2330,13 +2039,17 @@ C************ USED IN THE SUBROUTINE INMNN.                      *******
             MAX = 1
             MIN = MAX + M3
             MCY = MIN + M3
-            MX2 = MCY + M3
+            MS2 = MCY + M3
             CALL INMMN (NFT, NS, IF1, IF2, NST, N(MAX), N(MIN), 
      1                  N(MCY), NF1ST, NF2ST, MMN, M3, NS1, NS2, NTF, 
      2                  NF, N(MS2))
+            WRITE (11,*) 'LEFT, NST, M3',LEFT, NST, M3
             DO 370 I =1, MMN
-               N(MMN + 1) = N(MIN I - 1)
-  370       N(2 * MMN + 1) = N(MCY + I -1)
+               N(MMN + I) = N(MIN + I - 1)
+  370       N(2 * MMN + I) = N(MCY + I -1)
+            WRITE (11,*) 'MCY+MMN',MCY+MMN
+            !close(11)
+            !open(unit=11, access='APPEND')
 C************ CALCULATE THE STARTING POINT WITHIN THE N ARRAY    *******
 C************ (WHICH IS REALLY THE A ARRAY) FOR EACH ARRAY       *******
 C************ USE IN THE SUBROUTINE GENFL.                       *******
@@ -2347,7 +2060,7 @@ C************ USE IN THE SUBROUTINE GENFL.                       *******
             MINDEX = MCY
             MJTN = MINDEX
             MFF = MJTN
-            IF (IAFS .EQ. 0) GO TO 370    ! ?PSV
+            IF (IAFS .EQ. 0) GO TO 380    ! ?PSV
             MCY = MPMAX + NTF
             MINDEX = MCY + NTF
             MJTN = MINDEX + (NTF + 1)
@@ -2356,21 +2069,26 @@ C************ USE IN THE SUBROUTINE GENFL.                       *******
   380       MRR = MFF + 2 * NFT
             NNRAN = NRAN + 1
             NNPI = NPI + 1
-            MPR = MPR + (IVP + 2) * NNRAN
+            MPR = MRR + (IVP + 2) * NNRAN
             MIRR = MPR + (IVP + 2) * NNPI
             NRMAX = MAX0(NNRAN,NNPI)
-            MMS = MIRR + (IVP + 2) * NRMA
+            MMS = MIRR + (IVP + 2) * NRMAX
             JLEFT = LEFT
             LEFT = LEFT - MMS
             IF (LEFT .LT. 0) CALL ERROR (1,LEFT,NSIZE,MMS)
             MAXSS = LEFT / 2
             IF ((IFI .NE. 0) .AND. (IAFS .NE. 0)) REWIND IFI
 C************ CALCULATE THE FLIGHT SEQENCE                       *******
-            CALL GENFL (NF, NFT, NTF, NX, NST, N(I), N(MMN+1), 
+          write(11,*)'MMN,MRR,MPR,MIRR,MPMAX,MCY,MFF,MHPEAK,MIDP,MJTN'
+     1     , MMN,MRR,MPR,MIRR,MPMAX,MCY,MFF,MHPEAK,MIDP,MJTN
+            close(11)
+            open(unit=11, access='APPEND')
+            CALL GENFL (NF, NFT, NTF, NS, NST, N(1), N(MMN+1), 
      1                  N(2*MMN+1), MMN, IF2, N(MMS), MAXSS, PI, RAN, 
      2                  VP, XY, N(MRR), NNRAN, N(MPR), NNPI, N(MIRR),
      3                  NRMAX, ISS, N(MPMAX), N(MCY), N(MFF), NFRS, 
      4                  N(MHPEAK), N(MIDP), N(MJTN))
+            
 C************ CALCULATE THE STARTING POINT WITHIN THE N ARRAY    *******
 C************ (WHICH IS REALLY THE A ARRAY) FOR EACH ARRAY       *******
 C************ USE IN THE SUBROUTINE GENAFAS.                     *******
@@ -2380,8 +2098,11 @@ C************ USE IN THE SUBROUTINE GENAFAS.                     *******
             MMS = MFLG + NTF
             LEFT = JLEFT
             LEFT = LEFT - MMS
+            WRITE(11,*)'iafs, LEFT ',iafs, LEFT
+            close(11)
+            open(unit=11,access='APPEND')
             IF (LEFT .LT. 0) CALL ERROR (1,LEFT,NSIZE,MMS)
-            IF (IAFT .EQ. 0) RETURN
+            IF (IAFS .EQ. 0) RETURN
 C************  GENERATE THE ALTERNATE FLIGHT SEQUENCE            *******
             CALL GENAFS (N(MCY), N(MPMAX), N(MREC), N(MAFS), N(MFLG), 
      1                   NTF, N(MMS), N(MRR), NNRAN, N(MPR), NNPI, 
@@ -2389,7 +2110,7 @@ C************  GENERATE THE ALTERNATE FLIGHT SEQUENCE            *******
      3                   N(MHPEAK), N(MIDP), N(MJTN))
             IF (IFI .EQ. 0) RETURN
 C************ SAVE THE ALTERNATE FLIGHT SEQUENCE ON MAGNETIC TAPE ******
-            MMS = MFLAG
+            MMS = MFLG
             CALL WTAPE (N(MREC), N(MCY), N(MMS), NTF, NTF)
             RETURN
          END
@@ -2435,9 +2156,12 @@ C**********  SEGMENTS AND CYCLES.
      2                    M3-MMN, NNM, NF(I), NCY(MMN), I)
                JF1 = JF1 + NSS
                JF2 = JF2 + NSS
-               JS2 = JS1 + NS1
+               JS1 = JS1 + NS1
                JS2 = JS2 + NS2
                NS(I) = JS2 - 1 + (NST+1) * MMN
+               WRITE(11,*)'I,NS(I) ',I, NS(I)
+                !close(11)
+                !open(unit=11, access='APPEND')
                MMN = MMN + NNM
                IF (MMN .GE. M3) CALL ERROR (3,MMN,M3,I)
    20       CONTINUE
@@ -2447,11 +2171,9 @@ C**********  SEGMENTS AND CYCLES.
 C**********  AFTER PERFORMING THE COMBINING OF SEGMETS,          *******
 C**********  RECREATE THE F2 ARRAY.                              *******
             DO 40 I = 1,JS2
-   40       IF 2(I) = IS2(I)
+   40       IF2(I) = IS2(I)
             RETURN
          END
-
-
 
          SUBROUTINE AMMN (NSS, IF1, IF2, IS1, IS2, NS1, NS2, SMAX, SMIN,
      1                    NCY, MM, MMN, NF, BCY, IDFT)
@@ -2465,17 +2187,26 @@ C**********  ARRAYS.                                                ***
             DIMENSION AMAX(25), AMIN(25), ACY(25), BCY(MM)
    10       FORMAT (1X, 'AMMN ', 2I6, 19I4)
    20       FORMAT (1X, 'AMMN ', 6F12.2)
-            JS1 = 1
-            MMN = 1
+
+            AMAX=0     !
+            AMIN=0     ! PSV
+            ACY =0     !
+            BCY =0     !
+
+            JS1 = 0
+            MMN = 0
 C***********  SUMMATION OF CYCLES                               ********
 C***********  F1 COMBINING OF SEGMENTS                          ********
+            !rewind iuil ! PSV
             DO 80 I = 1,NSS
 C***********  READ IN NUMBER OF GROUPS, PEAK VALUE, VALLEY      ********
 C***********  NUMBER OF CYCLES SEQUENCE FROM UTILITY TAPE       ********
                READ (IUIL) KMMN, (AMAX(K), AMIN(K), ACY(K), K = 1, KMMN)
+               write(15,*) 'idft ',idft, KMMN, 
+     1         (AMAX(K), AMIN(K), ACY(K), K = 1, KMMN)
                KF1 = IF1(I)
                IF (KF1 .EQ. 0) GO TO 70
-               IF (KF1 .LE. JS1) GO TO 80
+               IF (KF1 .LE. JS1) GO TO 50
                JS1 = JS1 + 1
                DO 30 J = 1, KMMN
                   MMN = MMN + 1
@@ -2493,6 +2224,7 @@ C***********  NUMBER OF CYCLES SEQUENCE FROM UTILITY TAPE       ********
                   BCY(J) = BCY(J) + ACY(K)
    60          K = K + 1
    70          IF2(I) = 0
+               WRITE(15,*) 'KF1 ', KF1
    80       CONTINUE
             NS1 = JS1
             K1 = 1
@@ -2502,7 +2234,7 @@ C************  CYCLES THAT ARE LESS THAN 0.5                     *******
             DO 100 I = 1,NS1
                K2 = IS1(I)
                DO 90 J = K1,K2
-                  NCY(L) = BCY(J) + 5000001
+                  NCY(L) = BCY(J) + 0.5000001
                   SMAX(L) = SMAX(J)
                   SMIN(L) = SMIN(J)
                   IF (NCY(L) .GT. 0) L = L + 1
@@ -2515,6 +2247,8 @@ C************  MOVE DOW TO THE END OF THE ARRAYS SO THAT F2      *******
 C************  COMBINING OF SEGMENTS CAN BE DONE                 *******
             K = MMN
             J = MM
+            write(11,*) 'MMN,NSS ',MMN,NSS
+            WRITE(17,*)'bef 110 ID, NCY',idft, (ncy(I17),I17=1,NSS)
             DO 110 I = 1, MMN
                SMAX(J) = SMAX(K)
                SMIN(J) = SMIN(K)
@@ -2525,15 +2259,16 @@ C************  COMBINING OF SEGMENTS CAN BE DONE                 *******
             KS1 = 1
 C************ F2 COMBINING OF SEGMENTS
             NSS1 = NSS + 1
+            WRITE(17,*)'ID, NCY',idft, (ncy(I17),I17=1,NSS)
             DO 210 I = 1, NSS
-               IS1(I) = 0
+               IS2(I) = 0
                KKQ = K
                KQ = KKQ + 1
                KF1 = 0
                DO 200 J = 1, NSS1
                   IF (J .EQ. NSS1) GO TO 120
                   IF (IF2(J) .NE. 0) KF1 = KF1 + 1
-                  IF (IF2(J) .NE. 1) GO TO 200
+                  IF (IF2(J) .NE. I) GO TO 200       ! PSV: 1 -> I
                   GO TO 180
   120             IF (KKQ .EQ. K) GO TO 220
                   KQQ = KQ + IS2(I) -1
@@ -2556,6 +2291,7 @@ C************ FORMULATE FICTITIOUS LOAD LEVEL
                   IF (MIN. NE. 0) GO TO 150
   140             SMIN(KQQ+1) = SMIN(KQ)
                   SMAX(KQQ+1) = SMIN(KQ)
+                  GO TO 170
   150             IF (MAX .NE. 0) GO TO 160
                   SMAX(KQQ+1) = SMAX(KQ)
                   SMIN(KQQ+1) = SMIN(KQ)
@@ -2569,6 +2305,7 @@ C***  WRITE (2,20) (SMAX(L), SMIN(L), L = KQ,KK)
   180             K2 = IS1(KF1) + NDEL
                   IF (KF1 .EQ. 1) K1 = 1 + NDEL
                   IF (KF1 .NE. 1) K1 = IS1(KF1-1) + 1 + NDEL
+                  write(11,*) 'I, J, K1, K2 ',I, J, K1, K2
                   DO 190 L = K1,K2
                      K = K + 1
                      SMAX(K) = SMAX(L)
@@ -2577,6 +2314,7 @@ C***  WRITE (2,20) (SMAX(L), SMIN(L), L = KQ,KK)
   190             NCY(K) = NCY(L)
                   IS2(I) = IS2(I) + K2 - K1 + 1
   200          CONTINUE
+               write(17,*) 'ID, I, NCY',idft, I,NCY(I)
   210       CONTINUE
             I = NSS1
   220       NS2 = I -1
@@ -2584,6 +2322,10 @@ C***  WRITE (2,20) (SMAX(L), SMIN(L), L = KQ,KK)
             DO 230 I = 2,NS2
                IS2(I) = IS2(I) + IS2(I-1)
   230       CONTINUE
+            WRITE(11,*)'NSS,IS2 ',NSS, (IS2(I17),I17=1,NSS)
+            WRITE(17,*)'ID, NCY',idft, (ncy(I17),I17=1,NSS)
+            !close(11)
+            !open(unit=11, access='APPEND')
             LINE = 60
             IS = 1
             IAA = 0
@@ -2600,7 +2342,7 @@ C***********   PRINT OUT AFTER SEGMENT COMBINING               *********
                CALL NEWPG
                WRITE (6,240) IDFT
   240          FORMAT (4X, 'FLIGHT TYPE', I4, 7X, 'F2', 9X, 'MIN.', 7X,
-     1                 'MAX.', / , 25X, 'SEGEMENT', 5X 'STRESS', 5X, 
+     1                 'MAX.', / , 25X, 'SEGMENT', 5X 'STRESS', 5X, 
      2                 'STRESS', 6X, 'CYCLES', 6X, 'CYCLES/FLIGHT',/)
                LINE = 0
   250          WRITE (6,260) IS, SMIN(I), SMAX(I), NCY(I), AA
@@ -2622,18 +2364,18 @@ C***********   PRINT OUT AFTER SEGMENT COMBINING               *********
 
 
 
-         SUBROUTINE GENFL (NF, NFT, NTF, NST, SMAX, SMIN, NCY, NMM, IS2,
-     1                      SMM, MAXSS, PI, RAN, VP, XY, RR, NNRAN, PR,
-     2                      NNPI, IRR, NRMA, ISS, PMAX, MCY, NFF, IPF,
-     3                      HPEAK, IDPEAK, JTN)
+         SUBROUTINE GENFL(NF,NFT,NTF,NS,NST,SMAX,SMIN,NCY,NMM,IS2,
+     1                    SMM, MAXSS, PI, RAN, VP, XY, RR, NNRAN, PR,
+     2                    NNPI, IRR, NRMAX, ISS, PMAX, MCY, NFF, IPF,
+     3                    HPEAK, IDPEAK, JTN)
 C***********  THIS SUBROUTINE GENERATES THE SEQUENCE OF FLIGHTS.  ******
 C***********  DEPENDING UPON INPUT, THE SEQUENCE CAN BE RANDOMLY  ******
 C***********  GENERATED OR USER SPECIFIED.                        ******
 C***********  SUBROUTINES CALLED - DISTRD, GENCY, PRNTSS          ******
-            COMMON NPG, TITLE(2), NSIZE, LEFT, IERR, IRS, IUIL, NPI, 
+            COMMON NPG, TITLE(20), NSIZE, LEFT, IERR, IRS, IUIL, NPI, 
      1             NRAN, IVP, IFI, NXY, CLIP, CLIV, FACTOR, ELIMP, 
      2             ELIMV, IPFS, IPSS, IPTF, IAFS, NEXT, NOW, IFRS, 
-     3             JAXHP, IKF, IKC
+     3             MAXHP, IKF, IKC
             INTEGER RR(NNRAN,1), PR(NNPI,1)
             DIMENSION NF(NFT), NS(NFT), SMAX(NMM), SMIN(NMM), IS2(NST),
      1                XY(2,1)
@@ -2643,6 +2385,7 @@ C***********  SUBROUTINES CALLED - DISTRD, GENCY, PRNTSS          ******
             DIMENSION IPF(2,1), NFF(2,NFT), HPEAK(*), IDPEAK(*)
    20       FORMAT (1X, 'GEN FL', 20I6)
    30       FORMAT (1X, 'GEN FL', 10F12.2)
+            write(12,*) 'RR0',((RR(i8,j8), i8=1,nnran),j8=1,28)
             KF = 11111
             IF (IKF .NE. 0) KF = IKF
             KC = 12345
@@ -2656,13 +2399,19 @@ C***********  SUBROUTINES CALLED - DISTRD, GENCY, PRNTSS          ******
             IS = 1
             KLINE = 60
             NFT2 = 2 * NFT
+            WRITE(11,*)'npss ',npss
+            !close(11)
+            !open(unit=11, access='APPEND')
 C************  ZERO OUT THE TABLES USED IN THE SPECTRUM SUMMATION
             DO 40 I = 1,NFT2
    40       NFF(I,1) = 0
+            WRITE(11,*)'NMM ',NMM
+            !close(11)
+            !open(unit=11, access='APPEND')
             DO 50 I = 1,6
    50       IJJ(I) = 0
             IF (IRS .EQ. 1) GO TO 70
-            DO 60 I = 1,6
+            DO 60 I = 1,NMM
    60       NCY(I,2) = NCY(I,1)
    70       IIVP = IVP + 2
             DO 100 I = 1, IIVP
@@ -2673,18 +2422,24 @@ C************  ZERO OUT THE TABLES USED IN THE SPECTRUM SUMMATION
    90          PR(J,I) = 0
    91          CONTINUE
   100       CONTINUE
+            WRITE(11,*)'NNPI ',NNPI
+            !close(11)
+            !open(unit=11, access='APPEND')
             IF (MAXHP .EQ. 0) GO TO 120
 C************ ZERO OUT HIGHEST PEAK ARRAYS
             DO 110 J = 1, MAXHP
                HPEAK(J) = 0.0
                IDPEAK(J) = 0
   110       CONTINUE
-  120       SMM(1,1) = 1.E20
+  120       SMM(1,1) = -1.E20
             SMM(2,1) = 1.E20
             NST1 = NST + 1
             I1 = 2
             I2 = 1
             JPF = 1
+            WRITE(11,*)'MAXHP,NTF ',MAXHP,NTF
+            !close(11)
+            !open(unit=11, access='APPEND')
             DO 190 II = 1, NTF
                IF (IFRS .EQ. 0) GO TO 130
 C************  THE SEQUENCE OF FLIGHT NUMBERS IS SPECIFIED BY INPUT
@@ -2695,45 +2450,60 @@ C************  THE SEQUENCE OF FLIGHT NUMBERS IS SPECIFIED BY INPUT
 C************  THE SEQUENCE NUMBER OF FLIGHT NUMBERS IS RADOMLY GENERATED
   130          CALL DISTRD (NF, NFT, KF, JF)
   140          NFF(1,JF) = NFF(1,JF) + 1
-               MMN = NS(JF) / NST
+               MMN = NS(JF) / NST1
                IF (JF .NE. 1) JS2 = NS(JF-1) - NST1 * (NS(JF-1) / 
      1                              NST1) + 1
                IF (JF .EQ. 1) JS2 = 1
-               NSS = NS(JF) - MNN * NST1 - JS2 + 1
+               NSS = NS(JF) - MMN * NST1 - JS2 + 1
 C***  WRITE (2,10) I1, NMM, IRS
 C***  WRITE (2,10) NSS,JF,MMN,NST1,JS2,JPF,NF,NS,NFT,NTF,MAXSS
-               IF (I1 .EQ. NTF) I2 = 0
+               IF (II .EQ. NTF) I2 = 0
+!            WRITE(11,*)'NS(JF),NST1,KF,JF,JS2,NSS ',NS(JF),NST1,KF,
+!     1      JF,JS2,NSS
+            !close(11)
+            !open(unit=11, access='APPEND')
+            write(12,*) 'RRA',((RR(i8,j8), i8=1,nnran),j8=1,28)
 C************ GENERATE CYCLE SEQUENCE
                CALL GENCY (IS2(JS2), SMAX(MMN), SMIN(MMN), NCY(MMN,1), 
      1                     NF(JF), SMM(1,1), MAXSS, NSS, NCY(MMN,2), 
      2                     PI, RAN, VP, XY, RR, NNRAN, PR, NNPI, KC, I1,
      3                     I2, IJJ, II, JF, NPRNT, KLINE, AMAX, KCY, 
-     4                     KPTF)
-               IF (IAFS .EQ. 0) GO TO 150
+     4                     NPTF)
+            WRITE(11,*)'IAFS ',IAFS
+            write(12,*) 'RRB',((RR(i8,j8), i8=1,nnran),j8=1,28)
+            !close(11)
+            !open(unit=11, access='APPEND')
+               IF (IAFS .EQ. 0) GO TO 145
 C*********** SAVE THE HIGHEST PEAK AND NUMBER OF CYCLES FOR EACH FLIGHT
 C*********** TO BE USED FOR THE ALTERNATE FLIGHT SEQUENCE
-               PMAX(I1) = AMAX
-               MCY(I1) = 1 * KCY
-               JTN(I1) = JF
+               PMAX(II) = AMAX    !  PSV
+               MCY(II) = 2 * KCY  !  I1 -> II
+               JTN(II) = JF       !
                GO TO 170
+  145        IF (MAXHP.EQ.0) GO TO 170
 C*********** DETERMINE AND SAVE THE HIGHEST PEAK AND CORRESPONDING
 C*********** FLIGHT NUMBER FOR MAXHP (SPECIFIED BY INPUT) NUMBER
 C*********** OF FLIGHTS
                HP = AMAX
-               III = I1
+               III = II   !PSV I1 ->II
                DO 160 I = 1,MAXHP
                   IF (HP .LE. HPEAK(I)) GO TO 160
-                  DO 150 K = 1,MAXHP
+                  DO 150 K = I,MAXHP   !PSV  1 -> I
                      TMAX = HPEAK(K)
-                     HPEAK(K) = TMAX
+                     HPEAK(K) = HP
+                     HP=TMAX
                      IJF = IDPEAK(K)
                      IDPEAK(K) = III
                      III = IJF
   150             CONTINUE
   160          CONTINUE
-  170             I1 = 1
-                  NFF(2,JF) = NFF(2,JF) + KCY
-                  NF(JF) = NF(JF) -1
+  170          I1 = 1
+               NFF(2,JF) = NFF(2,JF) + KCY
+               NF(JF) = NF(JF) -1
+            write(12,*) 'RRC',((RR(i8,j8), i8=1,nnran),j8=1,2)
+            WRITE(11,*)'KCY, II, NPSS ',KCY, II, NPSS
+            close(11)
+            open(unit=11, access='APPEND')
                   IF ((II .NE. NPSS) .OR. (IAFS .NE. 0)) GO TO 180
 C***  WRITE (2,10) IJJ
 C***  WRITE (2,10) MCY
@@ -2741,19 +2511,13 @@ C***  WRITE (2,20) PMAX
 C************  IF NO ALTERNATE FLIGHT SEQUENCE IS DESIRED THEN
 C************  PRINT THE SPECTRUM SUMMATION TABLES
                   CALL PRNTSS (RR, NNRAN, PR, NNPI, IRR, NRMAX, IIVP, 
-     1                         RAN, VP, PI, IS, NFF, ISS, II, NFT, NTF, 
+     1                         RAN, VP, PI, IS, NFF, ISS, II, NTF, NFT, 
      2                         HPEAK, IDPEAK)
-
-
-
-
-
-
-
-
   180             IF (II .EQ. NPTF) GO TO 200
   190       CONTINUE
-  200       RETURN
+  200       write(12,*) 'RR2',((RR(i8,j8), i8=1,nnran),j8=1,28)
+            return
+! 200       RETURN
          END
 
 
@@ -2817,14 +2581,14 @@ C*********** SEQUENCE DEPENDING UPON TEH IAFS FLAG SPECIFIED BY INPUT
                         IFL = I
    50                CONTINUE
                      IF (IAFS .NE. 3) GO TO 60
-                     IADD(3) = -1 * (IADD(3))
+                     IADD(3) = -1 * IADD(3)
                      INO = IADD(3) * (II -1)
    60                IS = IS + INO
                      AFS(IS) = PHI
                      LREC(IS) = IFL
                      IFLAG(IFL) = 1
 C**********  FIND THE HIGHEST STRESSES AND ASSOCIATED FLIGHT NUMBERS
-                     IF (HAXHP .EQ. 0) GO TO 90
+                     IF (MAXHP .EQ. 0) GO TO 90
                      HP = PHI
                      III = IS
                      DO 80 JJ = 1, MAXHP
@@ -2868,8 +2632,10 @@ C**********  REPEAT AN EDIT 1 BETWEEN FLIGHTS BECAUSE OF REORDERING
                      NCY = NCY / 2
                      CALL REDIT1 (SMM, IJJ, NCY, EPS)
 C**********  SPECTRUM SUMMATION
-                     CALL SPSUM (SMM, I, NCY, PMAX(I), VP, RAN, PI, RR, 
-     1                           NNRAN, PR, NNPI)
+            write(12,*) 'RR0',((RR(j,i8), j=1,iivp),i8=1,nnran)
+                     CALL SPSUM (SMM, 1, NCY, PMAX(I), VP, RAN, PI, RR, 
+     1                           NNRAN, PR, NNPI)                            ! PSV I -> 1
+            write(12,*) 'RR1',((RR(j,i8), j=1,iivp),i8=1,nnran)
   150                FORMAT ('GEN AFS', 4I5, 4F10.0)
                      IF ( I .GT. NPRNT) GO TO 210
                      IF (LKINE .LT. 53) GO TO 160
@@ -2901,7 +2667,7 @@ C********** PRINT THE SPECTRUM SUMMATION
 C********** PRINT THE SPECTRUM SUMMATION
                      CALL PRNTSS (RR, NNRAN, PR, NNPI, IRR, NRMAX, 
      1                            IIVP, RAN, VP, PI, IS, NFF, ISS, I, 
-     2                            NTF, HPEAK, IDPEAK)
+     2                            NTF, NFT,HPEAK, IDPEAK)
   220                IF (I .EQ. NPTF) GO TO 240
   230             CONTINUE
   240             RETURN
@@ -2912,8 +2678,8 @@ C********** PRINT THE SPECTRUM SUMMATION
                SUBROUTINE GENCY (IS2, SMAX, SMIN, NCY, NF, SMM, MAXSS, 
      1                           NSS, KCY, PI, RAN, VP, XY, RR, NNRAN, 
      2                           PR, NNPI, KC, I1, I2, IJJ, II, JF, 
-     3                           NPRNT, KLINE, PMAX, MOY, INTF)
-C********* THS SUBROUTINE GENERATES THE CYCLE SEQUENCE FOR TEH GIVEN ***
+     3                           NPRNT, KLINE, PMAX, MCY, INTF)
+C********* THS SUBROUTINE GENERATES THE CYCLE SEQUENCE FOR THE GIVEN ***
 C********* FLIGHT.  IT THEN PERFORMS ALL EDITING OF THE CYCLES. IF   ***
 C********* A SAVE TAPE IS SPECIFIED AND NO ALTERNATE FLIGHT SEQUENCE ***
 C********* IS DESIRED, THEN THE CYCLE SEQUENCE WRITTEN DIRECTLY ONTO ***
@@ -2942,11 +2708,14 @@ C*********                      RITE, SPSUM, WTAPE                   ***
                   IF (II .EQ. 1) NERR5 = 0
                   EPS = 1.
                   PMAX = -1.E20
-                  DO 15  0 I = 1,NSS
+                  DO 150 I = 1,NSS
                      K2 = IS2(I)
                      NCS = 0
                      K3 = K2 - K0
                      LMM = IMM
+                    write(11,*)'K1,K2 ',K1,K2
+                        !close(11)
+                        !open(unit=11, access='APPEND')
                      DO 40 J = K1,K2
    40                NCS = NCS + NCY(J)
                      LCY = NCS / NF
@@ -2954,22 +2723,31 @@ C*********                      RITE, SPSUM, WTAPE                   ***
 C*******  IF PAIRED VALLEY PEAK COUPLING (IRS=1) IS SPECIFIED,
 C*******  FIND THE RANDOM CYCLE. IF INDIVIDUAL VALLEY PEAK
 C*******  COUPLING (IRS = 2) IS SPECIFIED, FIDN THE RANDOM PEAK.
-                        CALL DISTRD (NCY(K1), K3, K0, I0)
+                        CALL DISTRD (NCY(K1), K3, KC, IC)
+          !write(11,*)'NSS,LCY,NCY(K1),K3,K0,I0 ',NSS,LCY,NCY(K1),K3,K0,I0
+                        !close(11)
+                        !open(unit=11, access='APPEND')
                         IMM = IMM + 1
                         IF (IMM .LT. MAXSS) GO TO 50
                         CALL ERROR (4, IMM, NSIZE, JF)
                         STOP 7002
-   50                   SMM (1,IMM) = SMIN(I0+K0)
-                        NCY(I0+K0) = NCY(I0+K0) -1
+   50                   SMM (1,IMM) = SMIN(IC+K0)
+                        NCY(IC+K0) = NCY(IC+K0) -1
                         IF (IRS .EQ. 2) GO TO 60
-                        SMM(2,IFF) = SMAX(I0+K0)
+                        SMM(2,IMM) = SMAX(IC+K0)
                         GO TO 70
 C********* IF INDIVIDUAL VALLEY PEAK COUPLING (IRS=2) IS
 C********* SPECIFIED, FIND THE RANDOM VALLEY.
-   60                   CALL DISTRD (KCY(K1), K3, K0, J0)
-                        SMM(2,IMM) = SMAX(J0+K0)
-                        KCY(J0+K0) = KCY(J0+K0) -1
+   60                   CALL DISTRD (KCY(K1), K3, KC, JC)
+          !write(11,*)'KCY(K1),K3,K0,J0 ',KCY(K1),K3,K0,J0
+                        !close(11)
+                        !open(unit=11, access='APPEND')
+                        SMM(2,IMM) = SMAX(JC+K0)
+                        KCY(JC+K0) = KCY(JC+K0) -1
    70                   CONTINUE
+          !write(11,*)'IMM,J0,K0 ',IMM,J0,K0
+                        !close(11)
+                        !open(unit=11, access='APPEND')
 C********  EDIT 1
 C********  CHECK TO SEE IF MINIMU IS REALLY A VALLEY AND NOT AN
 C********  INTERMEDIATE POINT ON THE WAY TO A PEAK
@@ -2985,11 +2763,14 @@ C********  INTERMEDIATE POINT ON THE WAY TO A PEAK
    90                   FORMAT (1X, 4I5, 4F10.0)
                         SMM (2,IMM-1) = SMM(2,IMM)
                         IMM = IMM - 1
-  100                   IF (ABS(SMM(I,IMM) - SMM(2,IMM)) .LT. EPS) 
+  100                   IF (ABS(SMM(1,IMM) - SMM(2,IMM)) .LT. EPS) 
      1                      GO TO 110
                         IF ((SMM(1,IMM) - SMM(2,IMM))) 140, 110, 130
 C********* DROP OUT FICTITIOUS LOAD LEVELS
-  110                   SMM(I,IMM) = SMM(2,IMM)
+  110                   SMM(1,IMM) = SMM(2,IMM)
+                        write(11,*)'110 SMM ',SMM(1,IMM)
+                        !close(11)
+                        !open(unit=11, access='APPEND')
                         IF ((SMM(2,IMM) .LT. SMM(2,IMM-1))) GO TO 140
                         SMM(2,IMM-1) = SMM(2,IMM)
   120                   IMM = IMM - 1
@@ -2998,16 +2779,26 @@ C********* DROP OUT FICTITIOUS LOAD LEVELS
 C*********  VALLEY GREATER THAN PEAK IS IN THIS SEGMENT
 C*********  INTERCHANGE VALLEY AND PEAK
   130                   TEMP = SMM(1,IMM)
+                        write(11,*)'130 TEMP ',TEMP
+                        !close(11)
+                        !open(unit=11, access='APPEND')
+
                         SMM(1,IMM) = SMM(2,IMM)
                         SMM(2,IMM) = TEMP
   140                CONTINUE
 C***  WRITE (2,10) (IJJ(J), J = 1,3)
                      K0 = K2
                      K1 = K0 + 1
+                        write(11,*)'NSS,I,IMM ',NSS,I,IMM
+                        !close(11)
+                        !open(unit=11, access='APPEND')
   150             CONTINUE
 C**********  EDIT 2
                      KMM = IMM
                      IMM = I1 - 1
+                        write(11,*)'I1 ',I1
+                        !close(11)
+                        !open(unit=11, access='APPEND')
                      DO 260 JMM = I1,KMM
                         IMM = IMM + 1
                         SMM(1,IMM) = SMM(1,JMM)
@@ -3032,11 +2823,11 @@ C***  WRITE (2,20) SMM(1,IMM), SMM(2,IMM) RANGE, R
      1                       XY(2,K-1)) / (XY(1,K) - XY(1,K-1))
                         IF (RANGE .GT. RQ) GO TO 220
                         IF (IMM .EQ. 1) GO TO 190
-                        IF (SMM(2,IMM) .LE. SMM(2,IFF-1)) GO TO 190
-                        SMM(2,IFF-1) = SMM(2,IMM)
+                        IF (SMM(2,IMM) .LE. SMM(2,IMM-1)) GO TO 190
+                        SMM(2,IMM-1) = SMM(2,IMM)
                         GO TO 200
   190                   IF ((JMM+1) .GT. KMM) GO TO 200
-                        IF ((SMM(1,IFF) .GE. SMM(1,JMM+1))) GO TO 200
+                        IF ((SMM(1,IMM) .GE. SMM(1,JMM+1))) GO TO 200
                         SMM(1,JMM+1) = SMM(1,IMM)
   200                   IJJ(4) = IJJ(4) + 1
   210                   IMM = IMM -1
@@ -3045,8 +2836,8 @@ C***  WRITE (2,20) SMM(1,IMM), SMM(2,IMM) RANGE, R
 C******** ELIMINATRE PEAKS BY INPUT VALUES
 C******** CLIP PEAKS AND/OR VALLEY BY INPUT VALUES
   220                   IF (SMM(2,IMM) .GT. ELIMP) GO TO 210
-                        IF (SMM(2,IMM) .LT. CLILP) GO TO 250
-                        IF (SMM(1,IMM) .LT. CLILP) GO TO 240
+                        IF (SMM(2,IMM) .LT. CLIP) GO TO 250
+                        IF (SMM(1,IMM) .LT. CLIP) GO TO 240
 C********** IF BOTH VALLEY AND PEAK ABOE PAK CLIPPING ELIMINATE CYCLE
 C******OR IF BOTH VALLEY AND PEAK BELOW VALLEY CLIPPING ELIMINATE CYCLE
   230                   IMM = IMM -1
@@ -3054,15 +2845,15 @@ C******OR IF BOTH VALLEY AND PEAK BELOW VALLEY CLIPPING ELIMINATE CYCLE
                         GO TO 260
   240                   SMM(2,IMM) = CLIP
   250                   IF (SMM(1,IMM) .GT. CLIV) GO TO 260
-                        IF (SMM(2,IMM) .LT. C LIV) GO TO 230
+                        IF (SMM(2,IMM) .LT. CLIV) GO TO 230
                         SMM(1,IMM) = CLIV
   260                CONTINUE
                      MCY = IMM -1
-                     IF (MOY .EQ. 0) GO TO 340
+                     IF (MCY .EQ. 0) GO TO 350  ! PSV 340->350
 C********** REPEAT A TYPE 1 EDIT
                      CALL REDIT1 (SMM, IJJ, IMM, EPS)
-                     MOY = IMM - 1
-                     IF (MCY . EQ. 0) GO TO 340
+                     MCY = IMM - 1
+                     IF (MCY . EQ. 0) GO TO 350
 C********** MULTIPLICATION FACTOR
                      DO 270 I = 1,IMM
                         DO 270 J = 1,2
@@ -3080,7 +2871,7 @@ C********** TAPE IS SPECIFIED, THEN WRITE THE CYCLE SEQUENCE
 C********** DIRECTLY ONT THE OUTPUT TAPE.
   290                IF (IFI .NE. 0) CALL WTAPE (II, (IMM-I2), SMM, 
      1                                             INTF, I1)
-                     IF (II .GT. NRNT) GO TO 320
+                     IF (II .GT. NPRNT) GO TO 340
                      IF (KLINE . LT. 53) GO TO 300
                      CALL NEWPG
                      KLINE = 5
@@ -3088,7 +2879,7 @@ C********** DIRECTLY ONT THE OUTPUT TAPE.
                      KLINE = KLINE + 2
                      DO 320 JJ = 2,IMM,5
                         J1 = JJ
-                        J2 = J1
+                        J2 = J1+4
                         IF (J2 .GT. IMM) J2 = IMM
                         IF (KLINE .LT. 55) GO TO 310
                         CALL NEWPG
@@ -3140,6 +2931,33 @@ C********* SUBROUTINES CALLED - RANIC                            *******
 
 
 
+                  SUBROUTINE RANIC1 (K0, R)
+C******** THIS SUBROUTINE GENERATES A PSEUDO RANDOM NUMBER, WHICH   ***
+C******** LIES BETWEEN 0 AND 1 INCLUSIVE, SUCCESSIVE ENTRIES WILL   ***
+C******** YIELD A SERIES OF NUMBER WHICH CONFORM TO A UNIFORM       ***
+C******** DISRIBUTIO.  THE SERIES REPEATS AFTER APPROXIMATELY       ***
+C******** 10**6 NUMBERS
+C
+C            K - I/O = GENRATING INTEGER ARGUMENT. K MUST BE
+C                      INITIALIZED TO ANY NON-ZERO VALUE.  THEREAFTER
+C                      K IS MODIFIED BY THE SUBROUTINE AND SHOULD NOT
+C                      BE CHANGED BY THE USER.
+C            R = O   = THE GENERATED RANDOM NUMBER
+                     common/cranic/ icall, k
+                     data icall/0/
+                     DATA IMAX /2147483647/
+                     if (icall.eq.0) then
+                        icall=1
+                        k=k0
+                     end if
+                     K = K * 2051
+                     IF (K .LT. 0) K = K + IMAX + 1
+                     K = MOD(K,4194304)
+                     R = FLOAT(K) / 4194304.
+                     RETURN
+                  END 
+
+
                   SUBROUTINE RANIC (K, R)
 C******** THIS SUBROUTINE GENERATES A PSEUDO RANDOM NUMBER, WHICH   ***
 C******** LIES BETWEEN 0 AND 1 INCLUSIVE, SUCCESSIVE ENTRIES WILL   ***
@@ -3159,7 +2977,6 @@ C            R = O   = THE GENERATED RANDOM NUMBER
                      R = FLOAT(K) / 4194304.
                      RETURN
                   END 
-
 
 
                   SUBROUTINE REED (A, MAT, NSIZE)
@@ -3186,13 +3003,13 @@ C********** SUBROUTINES CALLED - NONE
 C*********** CHECK TO SEE OF MINIMM US REALLY A VALLEY AND NOT AN
 C*********** INTERMEDIATE POINT ON THE WAY TO A PEAK
                         IF (SMM(1,IMM-1) .NE. SMM(2,IMM-1)) GO TO 10
-                        IF (SMM(1,IMM-1) .GT. SMM(1,IMM-1)) SMM(1,IMM-1)
+                        IF (SMM(1,IMM-1) .GT. SMM(1,IMM)) SMM(1,IMM-1)
      1                                        = SMM(1,IMM)
                         SMM(2,IMM-1) = SMM(2,IMM)
                         IMM = IMM - 1
                         IJJ(2) = IJJ(2) + 1
                         GO TO 60
-   10                   IF (SMM(1,IMM) .LT. SMM(2,IFF-1)) GO TO 20
+   10                   IF (SMM(1,IMM) .LT. SMM(2,IMM-1)) GO TO 20
                         IJJ(1) = IJJ(1) + 1
                         SMM(2,IMM-1) = SMM(2,IMM)
                         IMM = IMM - 1
@@ -3226,8 +3043,9 @@ C********  SUBROUTINES CALLED - NONE
                      COMMON ISKIP(26), NPI, NRAN, IVP
                      DIMENSION SMM(2,*), RAN(*), VP(*), PI(*)
                      INTEGER RR(NNRAN,1), PR(NNPI,1)
+            write(12,*) 'RR*',((RR(i8,j), i8=1,nnran), j=1,2)
                      DO 80 KMM = I1,I3
-                        IF (SMM(2,KIMM) .GT. PMAX) PMAX = SMM(2,KMM)
+                        IF (SMM(2,KMM) .GT. PMAX) PMAX = SMM(2,KMM)
                         RANGE = SMM(2,KMM) - SMM(1,KMM)
                         R = SMM(1,KMM) / SMM(2,KMM)
 C************* TEST RATIO (MIN.MAX) AGAINST INPUT VALLEY/PEAK RATIO
@@ -3241,6 +3059,7 @@ C************* TEST RANGE AGAINST INPUT RANGE INTERVALS
    40                   CONTINUE
                         L = NRAN + 1
    50                   RR(L,K) = RR(L,K) + 1
+                        write(14,*) L,K
 C************* TEST MAXIMUM STRESS AGAINST INPUT PEAK INTERVALS
                         DO 60 M = 1, NPI
                            IF (PI(M) .GE. SMM(2,KMM)) GO TO 70
@@ -3254,39 +3073,44 @@ C************* TEST MAXIMUM STRESS AGAINST INPUT PEAK INTERVALS
 
 
 
-                  SUBROUTINE PRNTSS (RR, NNRAN, PR, NNPI, IRR, NRMAX, 
-     1                               IIVP, RAN, VP, PI, IS, NFF, ISS, 
-     2                               II, NTF, NFT, PMAX, MFT)
+         SUBROUTINE PRNTSS (RR, NNRAN, PR, NNPI, IRR, NRMAX, 
+     1                      IIVP, RAN, VP, PI, IS, NFF, ISS, 
+     2                      II, NTF, NFT, PMAX, MFT)
 C********* THIS SUBROUTINE PRINTS OUT THE TWO SPECTRUM SUMMATION   *****
 C********* TABLES, RANGE VERSUS VALLEY/PEAK RATIO, AND PEAK VERSUS *****
 C********* PEAKS AND THEIR CORRESPONDING FLIGHT NUMBER.            *****
 C*******SUBROUTINES CALLED - NEW PG                                *****
-                     COMMON ISKIP(26), NPI, NRAN, IVP, SKIP(8), IPSS, 
-     1                                SSKIP(5), MAXHP
-                     INTEGER RR(NNRAN,1), PR (NNPI,1)
-                     DIMENSION RAN(*), VP(*), PI(*), IRR(NRMAX,*)
-                     DIMENSION NFF(2,1), TITLE1(6), TITLE2(6), 
-     1                         TITLE3(2), TITLE4(4)
-                     DIMENSION FORM(4), FMAT(6), ISS(*), PMAX(*), MFT(*)
-   10                FORMAT (30X, 'SPECTRUM SUMMATION FOR A TOTAL OF', 
-     1                       I5, ' FLIGHTS AND', I7, ' CYCLES')
-   20                FORMAT (2X, 'VALLEY.PEAK RATIO ', 6X, 6F16.2)
-   30                FORMAT (14X, 'RANGE ')
-   40                FORMAT (9X, 2F7.0, 7(2I7,2X))
-   50                FORMAT (2X, 'BELOW OR EQUAL ', F7.0, 7(2I7,2X))
-   60                FORMAT (9X, ' ABOVE ', F7.0, 7(2I7,2X))
-   70                FORMAT (15X, 'PEAK ')
+         COMMON ISKIP(26), NPI, NRAN, IVP, SKIP(8), IPSS, 
+     1                    SSKIP(5), MAXHP
+         INTEGER RR(NNRAN,1), PR (NNPI,1)
+         DIMENSION RAN(*), VP(*), PI(*), IRR(NRMAX,*)
+         DIMENSION NFF(2,1), TITLE1(6), TITLE2(6), 
+     1             TITLE3(2), TITLE4(4)
+         DIMENSION FORM(4), FMAT(6), ISS(*), PMAX(*), MFT(*)
+         DATA TITLE1/4HFLIG,4HHT  ,4HNUMB,4HER  ,4H NUM,4HBER /
+         DATA TITLE2/4H TYP,4HE   ,4HFLIG,4HHTS ,4H CYC,4HLES /
+         DATA TITLE3/4HTOTA,4HL   /
+         DATA TITLE4/4HPEAK,4H   F,4HLIGH,4HT   /
+   10    FORMAT (30X, 'SPECTRUM SUMMATION FOR A TOTAL OF', 
+     1           I5, ' FLIGHTS AND', I7, ' CYCLES')
+   20    FORMAT (2X, 'VALLEY.PEAK RATIO ', 6X, 6F16.2)
+   30    FORMAT (14X, 'RANGE ')
+   40    FORMAT (9X, 2F7.0, 7(2I7,2X))
+   50    FORMAT (1X, 'BELOW OR EQUAL ', F7.0, 7(2I7,2X))
+   60    FORMAT (9X, ' ABOVE ', F7.0, 7(2I7,2X))
+   70    FORMAT (15X, 'PEAK ')
 
 C********** PRINT THE RANGE VERSUS VALLEY/PEAK RATIO********************
                      IVP3 = IIVP - 1
+            write(12,*) 'RR ',((RR(j,i), j=1,nnran),i=1,iivp)
                      DO 80 I = 1,NNRAN
                         DO 80 J = 1,IVP3
-   80                RR(K,IIVP) = RR(I,IIVP) + RR(I,J)
+   80                RR(I,IIVP) = RR(I,IIVP) + RR(I,J)
                      DO 90 J = 1,IIVP
-   90                IRR (NNRAN,J) = RR(I,J)
-                     DO 100 I = 1,NNRAN
+   90                IRR (NNRAN,J) = RR(1,J)
+                     DO 100 I = 1,NRAN
                         DO 100 J = 1,IIVP
-  100                IRR(NNRAN -I,J) = IRR(NNRAN-I,J) + RR(I+1,J)
+  100                IRR(NNRAN -I,J) = IRR(NNRAN-I+1,J) + RR(I+1,J)
                      DO 110 I = 1,NRAN
                         DO 110 J = 1,IIVP
   110                IRR(I+1,J) = IRR(I,J) - RR(I,J)
@@ -3304,26 +3128,43 @@ C********** PRINT THE RANGE VERSUS VALLEY/PEAK RATIO********************
                      IF (IVP2 .NE. IIVP) GO TO 140
                      ITAB = IVP2 -IVP1 + 1
                      FORM(2) = FMAT(ITAB)
-                     WRITE (6,FORM) TITLE3
+                     !WRITE (6,FORM) TITLE3
+                     WRITE (6,'(2A4)') TITLE3
   140                WRITE (6,30)
   150                CONTINUE
-                     WRITE (6,60) (RAN(NRAN), RR(NNRAN,J), IRR(NNRAN,J), 
+                     WRITE (6,50) RAN(1), (RR(1,J),IRR(1,J), 
+     1                            J = IVP1,IVP2)
+                     LINE=LINE+4
+                     write(12,*) 'iivp, ivp1, ivp2 ',iivp, ivp1, ivp2
+                     DO I=2,NRAN
+                        WRITE (6,40) RAN(I-1),RAN(I), 
+     1                  (RR(I,J),IRR(I,J), J = IVP1,IVP2)
+                        LINE=LINE+1
+                        IF ((LINE.LT.48).OR.(I.EQ.NRAN)) CYCLE
+                        LINE=0
+                        CALL NEWPG
+                        WRITE (6,10) II,IRR(1,IIVP)
+                        WRITE (6,20) (VP(J),J=IVP1,IVP3)
+                        IF(IVP2.EQ.IIVP) WRITE (6,'(2A4)') TITLE3
+                        WRITE (6,30)
+                     END DO
+                     WRITE (6,60) RAN(NRAN), (RR(NNRAN,J),IRR(NNRAN,J), 
      1                            J = IVP1,IVP2)
 C********** PRINT THE PEAK VERUS VALLEY/PEAK RATIO *********************
                      IVP1 = IVP2 + 1
                      IF (IVP1 .LE. IIVP) GO TO 120
                      IVP3 = IIVP -1
-                     DO 160 I = 1,NNP1
+                     DO 160 I = 1,NNPI
                         DO 160 J = 1,IVP3
   160                PR(I,IIVP) = PR(1,IIVP) + PR(I,J)
                      DO 170 J = 1,IIVP
   170                IRR(NNPI,J) = PR(I,J)
                      DO 180 I = 1,NPI
                         DO 180 J = 1,IIVP
-  180                IRR(NNPI-1,J) = IRR(NNPI-1,J + PR(I+1,J))
+  180                IRR(NNPI-I,J) = IRR(NNPI-I+1,J) + PR(I+1,J)
                      DO 190 I = 1,NPI
                         DO 190 J = 1,IIVP
-  190                IRR(I+1,J) = IRR(I,J) - PR(I,J)
+  190                IRR(I+1,J) = IRR(I,J) - PR(I,J)   ! ? PSV RR?
                      IF (LINE .LT. 35) GO TO 200
                      LINE = 0
                      CALL NEWPG
@@ -3331,8 +3172,8 @@ C********** PRINT THE PEAK VERUS VALLEY/PEAK RATIO *********************
   200                IVP1 = 1
   210                IVP2 = IVP1 + 5
                      IF (IVP2 .GT. IIVP) IVP2 = IIVP
-                     IVP3 = IVP 2
-                     IF (IVP2 .GT. IVP) IVP2 = IIVP
+                     IVP3 = IVP2
+                     IF (IVP2 .GT. IVP) IVP3 = IVP
                      IF (LINE .LT. 45) GO TO 220
                      LINE = 0
                      CALL NEWPG
@@ -3341,12 +3182,13 @@ C********** PRINT THE PEAK VERUS VALLEY/PEAK RATIO *********************
                      IF (IVP2 .NE. IIVP) GO TO 230
                      ITAB = IVP2 - IVP1 + 1
                      FORM(2) = FMAT(ITAB)
-                     WRITE (6,FORM) TITLE3
+                     !WRITE (6,FORM) TITLE3
+                     WRITE (6,'(2A4)') TITLE3
   230                WRITE (6,70)
-                     WRITE (6,50) PI(1), PR(I,J), IRR(I,J), IVP1, IVP2
+                     WRITE (6,50) PI(1),(PR(1,J),IRR(1,J), J=IVP1,IVP2)
                      LINE = LINE + 4
                      DO 250 I = 2,NPI
-                        WRITE (6,40) PI(I+1), PI(I), (PR(I,J), IRR(I,J), 
+                        WRITE (6,40) PI(I-1), PI(I), (PR(I,J), IRR(I,J), 
      1                               J=IVP1, IVP2)
                         LINE = LINE + 1
                         IF ((LINE .LT. 48) .OR. (I .EQ. NPI)) GO TO 250
@@ -3355,7 +3197,8 @@ C********** PRINT THE PEAK VERUS VALLEY/PEAK RATIO *********************
                         WRITE (6,10) II, IRR(1,IIVP)
                         WRITE (6,20) (VP(J), J=IVP1, IVP3)
                         IF (IVP2 .NE. IIVP) GO TO 240
-                        WRITE (6,FORM) TITLE3
+                        !WRITE (6,FORM) TITLE3
+                        WRITE (6,'(2A4)') TITLE3
   240                   WRITE (6,70)
   250                CONTINUE
                      WRITE (6,60) PI(NPI), (PR(NNPI,J), IRR(NNPI,J), 
@@ -3375,13 +3218,13 @@ C********** PRINT THE PEAK VERUS VALLEY/PEAK RATIO *********************
                         WRITE (6,260) ((TITLE2(K), K = 1,6), KK = 1,M3)
   260                   FORMAT (4(6A4,5X))
                         JLINE = 0
-  270                   WRITE (6,280) ((NFF(I,K), I = 1,2), K = M1,M2)
+  270                   WRITE (6,280) (K,(NFF(I,K), I = 1,2), K = M1,M2)
   280                   FORMAT (4(I5, 2I9, 6X))
                         JLINE = JLINE + 1
   290                CONTINUE
 C************** PRINT THE HIGHEST PEAKS AND THEIR CORRESPONDING  *******
 C************** FLIGHT NUMBER                                    *******
-  300                IF (MAXHP .EQ. 0) GO TO 350
+  300                IF (MAXHP .EQ. 0) GO TO 360
                      M3 = 6
                      IF (M3 .GT. MAXHP) M3 = MAXHP
                      IF (JLINE .LT. 45) GO TO 310
@@ -3400,7 +3243,7 @@ C************** FLIGHT NUMBER                                    *******
   340                   FORMAT (6(F8.2,I8,5X))
                         JLINE = JLINE + 1
   350                CONTINUE
-  360                IF (IRSS .EQ. IS) GO TO 380
+  360                IF (IPSS .EQ. IS) GO TO 390
                      IS = IS + 1
                      NPSS = ISS(IS)
                      KLINE = 60
