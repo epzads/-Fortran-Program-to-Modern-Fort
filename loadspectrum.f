@@ -59,11 +59,6 @@ C***  DOUBLE PRECISION DATA
          EQUIVALENCE (CBART, X(3837)), (AST, X(3838)), (YAW, X(3839)),
      1               (CYBT, X(3879)), (CYBTO,X(3919))
          REAL JX, JT, JSUM, ISLM, NEND, JI
-   10    FORMAT (I3, I3)
-C  20    FORMAT (13A6)  ! PSV 
-   20    FORMAT (13A4)  ! PSV
-   30    FORMAT ('1')
-   40    FORMAT (13A4)
          X=0.0
          Y=0.0
          DELTAY=0.0
@@ -71,607 +66,618 @@ C  20    FORMAT (13A6)  ! PSV
          CUMM1=0.0
          CUMM2=0.0
          CUMM3=0.0
-         DO 50 K = 1,25
-            DO 50 L = 1,40
+         DO K = 1,25
+            DO L = 1,40
                CSUM(L,K) = 0.0
                CYCLSM(L,K) = 0.0
-   50    CONTINUE
+            END DO
+         END DO
          READ (5,10) IREAD, ICARD
-         IF (IREAD .EQ. 2) GO TO 85
-         WRITE (6,30)
-         LINENO = 0
-         DO 80 K = 1, ICARD
-            LINENO = LINENO + 1
-            IF (LINENO -50)60,60,70
-   60       READ (5,20) (DATAIN(J), J = 1,13)
-            WRITE (6,40) (DATAIN(J), J = 1,13)
-            GO TO 80
-   70       WRITE (6,30)
+         IF (IREAD .NE . 2) THEN
+            WRITE (6,30)
             LINENO = 0
-            GO TO 60
-   80    CONTINUE
+            DO K = 1, ICARD
+               LINENO = LINENO + 1
+               IF (LINENO .GT. 50) THEN
+                  WRITE (6,30)
+                  LINENO = 0
+               ELSE
+                  READ (5,20) (DATAIN(J), J = 1,13)
+                  WRITE (6,40) (DATAIN(J), J = 1,13)
+               END IF
+            END DO
+         END IF
+
    85    II = 0
    90    N3958 = 3958
-         write(9,*) 'bef inp',X(1),int(X(1)),IEND,CSUM(1,1)
-         CALL NPUT1B (X(1), N3958, Y(1), II, IREF, ICAS, 0)
-         write(9,*) 'aft inp',X(1),int(X(1)),IEND,CSUM(1,1)
-  100    FORMAT ('REFERENCE RUN NO.', I6, 4X, 'CASE NO', I6)
-C***  WRITE REFERENCE RUN, CASE NO., AND SEGMENTS ON TAPE FOR
-C***  SPECTRUM LOADING RANDOM SEQUIENCE GENERATION PROGRAM
+         CALL NPUT1A (X(1), N3958, Y(1), II, IREF, ICAS, 0)
+C***     WRITE REFERENCE RUN, CASE NO., AND SEGMENTS ON TAPE FOR
+C***     SPECTRUM LOADING RANDOM SEQUIENCE GENERATION PROGRAM
          WRITE (3) IRR, ICASE, IEND
          WLPRNT = 0.0
-         IF (IW5 .EQ. 2) GO TO 110
-         CALL PRINT
-         write(9,*) 'aft prn',X(201),int(X(201)),IRR
-         WLPRNT = 1.0
-  110    B = 0.0
+         IF (IW5 .NE. 2) THEN
+            CALL PRINT
+            WLPRNT = 1.0
+         END IF
+         B = 0.0
          K1(1) = 0
          TCDMGM = 0.0
-         write(9,*) 'T:',T
-         write(9,*) 'TAB1:',TAB1
-         write(9,*) 'TAB2:',TAB2
-         write(9,*) 'TAB3:',TAB3
-         write(9,*) 'TAB4:',TAB4
-         write(9,*) 'TAB5:',TAB5
-         write(9,*) 'TAB6:',TAB6
-         write(9,*) 'DELT1:',DELT1
-         write(9,*) 'DELT2:',DELT2
-         write(9,*) 'DELT3:',DELT3
-         write(9,*) 'DELT4:',DELT4
-         write(9,*) 'DELT5:',DELT5
-         write(9,*) 'DELT6:',DELT6
-  120    DO 1070 I = 1, IEND
+  120    DO I = 1, IEND
             cumm=0.0
-            write(8,*) 'start cycle 1070 I ',I
-            DO 130 KJ = 1, 257
-  130       TBLSN (KJ) = 0.0
-            DO 140 KJ = 1, 31
-  140       TBLLD (KJ) = 0.0
+            DO KJ = 1, 257
+               TBLSN (KJ) = 0.0
+            END DO
+            DO KJ = 1, 31
+               TBLLD (KJ) = 0.0
+            END DO
             INTPER = 0
-            IF (B .EQ. 1.0) GO TO 540
-            AX = 0.0
-            CDMGM (I) = 0.0
-            JEND = N(I)
-            write(8,*) 'JEND ',JEND
-            K = JEND - 1
-            Q = 1.0
-C     SELECTION IS MADE WHETHER OR NOT TO USE THE MULTIPLYING
-C     FACTOR F(I)
-            IF (L1 - 1) 160,160,150
-  150       D = 1.0
-            GO TO 170
-  160       D = F(I)
-  170       IF ((M3(I) .GT. 9) .AND. (M3(I) .LT. 13)) GO TO 380
-C     LOAD SPECTRUM INPUT FORMAT IS SELECTED
-            write(9,*) 'B260 DELTAY:',DELTAY
-            DO 260 J = 1, JEND
-            write(8,*) 'start cycle 260 I,IEND,J,JEND ',I,IEND,J,JEND
-            M6 = M5(I)
-            GO TO (180,190,200,210,220,230,240), M6
-C     CALCULATE THE INCREMETAL RESPONSE DELTAY
-  180       DELTAY(J) = DELT1(J)
-            GO TO 250
-  190       DELTAY(J) = DELT2(J)
-            GO TO 250
-  200       DELTAY(J) = DELT3(J)
-            GO TO 250
-  210       DELTAY(J) = DELT4(J)
-            GO TO 250
-  220       DELTAY(J) = DELT5(J)
-            GO TO 250
-  230       DELTAY(J) = DELT6(J)
-            GO TO 250
-  240       DELTAY (J) = DELY1(I) + DELY11(I) * (Q - 1.0)
-  250       Q = Q +1.0
-            DY(I,J) = DELTAY(J)
-  260       CONTINUE
-            write(9,*) '260 DELY1:',DELY1
-            write(9,*) '260 DELY11:',DELY11
-            write(9,*) '260 DELTAY:',DELTAY
+            IF (B .NE. 1.0) THEN
+               AX = 0.0
+               CDMGM (I) = 0.0
+               JEND = N(I)
+               K = JEND - 1
+               Q = 1.0
+               !SELECTION IS MADE WHETHER OR NOT TO USE THE MULTIPLYING FACTOR F(I)
+               IF (L1 .GT. 1) THEN
+                  D = 1.0
+               ELSE
+                  D = F(I)
+               END IF
+               
+               IF ((M3(I) .LE. 9) .OR. (M3(I) .GE. 13)) THEN
+                  !LOAD SPECTRUM INPUT FORMAT IS SELECTED
+                  DO J = 1, JEND
+                     M6 = M5(I)
+                     !CALCULATE THE INCREMETAL RESPONSE DELTAY
+                     SELECT CASE (M6)
+                        CASE (1)
+                           DELTAY(J) = DELT1(J)
+                        CASE (2)
+                           DELTAY(J) = DELT2(J)
+                        CASE (3)
+                           DELTAY(J) = DELT3(J)
+                        CASE (4)
+                           DELTAY(J) = DELT4(J)
+                        CASE (5)
+                           DELTAY(J) = DELT5(J)
+                        CASE (6)
+                           DELTAY(J) = DELT6(J)
+                        CASE (7)
+                           DELTAY(J) = DELY1(I) + DELY11(I) * (Q - 1.0)
+                        CASE DEFAULT
+                           DELTAY(J) = DELT1(J)
+                     END SELECT
+                     Q = Q +1.0
+                     DY(I,J) = DELTAY(J)
+                  END DO
+                  
+                  ! ESTABLISH MAX AND MIN RESPONSE VALUES AT MIDPOINTS BETWEEN
+                  ! SUCCESSIVE DELTA Y VALUES
+                  DO J = 1, K
+                     AMIDY(J) = (DELTAY(J) + DELTAY(J + 1))/2.0
+                     IF(IW3 .NE. 1) P(I) = 0.0
+                     IF (N1FLAG(I).LE.2) THEN
+                        YMAX(J) = D*(AM(I) + AMIDY(J)) + P(I)
+                        IF (N1FLAG(I) .NE. 2) YMIN(J) = D*AM(I) + P(I)
+                        IF (N1FLAG(I) .EQ. 1) CYCLE
+                     ELSE
+                        YMAX(J) = D*AM(I) + P(I)
+                     END IF
+                     YMIN(J) = D*(AM(I) - AMIDY(J)) + P(I)
+                  END DO
+               END IF
+               
+               IF (M3(I) .GE. 13) THEN
+                  RHOO = 0.002378
+                  RHO1 = SIG(I) * RHOO
+                  IF (M3(I) .NE. 14 .AND. M3(I) .NE. 15) THEN
+                     VAR = 32.2 * AC * SLOPE(I) * RHO1
+                     WLOAD = 2.0 * WT(I)/WAREA
+                     FOUR = 4.0 * (WLOAD/VAR)
+                     PAR = FOUR + (6.28 / SLOPE(I))
+                     R1 = FOUR/PAR
+                     XARG = SCLTRB(I) / AC
+                     YARG = PAR
+                     XARGMN = TKSIG(18)
+                     YARGMN = TKSIG(2)
+                     IF (XARG .LT. XARGMN) THEN
+                        IF (YARG .LT. YARGMN) THEN
+                           WRITE (6,340) XARG, YARG, NSEG
+                        ELSE
+                           WRITE (6,360) XARG, NSEG
+                        END IF
+                     END IF
+                     NSEG = I + 50
+                     LEVEL = J
+                     CALL TWOVIN(XARG, YARG, TKSIG, OUTPUT, NSEG,LEVEL)
+                     AKSIG(I) = OUTPUT
+                     AKSIG(I) = R1 * AKSIG(I)
+                  END IF
+               END IF
+               
+               DO J = 1, JEND
+C                 CALCULATE THE CUMULATIVE CYCLES GIVEN VALUES OF DELTA Y
+                  M1 = M3(I)
+                  SELECT CASE (M1)
+                  CASE (1)
+                     CUMM(J) = T(I) * TAB1(J)
+                  CASE (2)
+                     CUMM(J) = T(I) * TAB2(J)
+                  CASE (3)
+                     CUMM(J) = T(I) * TAB3(J)
+                  CASE (4)
+                     CUMM(J) = T(I) * TAB4(J)
+                  CASE (5)
+                     CUMM(J) = T(I) * TAB5(J)
+                  CASE (6)
+                     CUMM(J) = T(I) * TAB6(J)
+                  CASE (7)
+                     CUMM(J) = (ARNO1(I)*EXP(-DELTAY(J)**2/
+     1                         (2.0*(SGMAX1(I))**2))
+     2                       +  ARNO2(I)*EXP(-DELTAY(J)**2/
+     3                         (2.0*(SGMAX2(I))**2))
+     4                       +  ARNO3(I)*EXP(-DELTAY(J)**2/
+     5                         (2.0*(SGMAX3(I))**2))) *  T(I)
+                  CASE (8,9,13,14,15)
+                     IF (M1.EQ.8 .OR. M1.EQ.13) ABR(I) = 
+     1                 (VELOS(I)*SLOPE(I)*WAREA*AKSIG(I))/(498.0*WT(I))
+                     IF (M1.EQ.14 .OR. M1.EQ.15) THEN
+                        AMGT = (2*WT(I)/(RHO1*CBART*32.2*SLOPE(I)*AST)*
+     1                  (YAW(I)/WT(I))) / SCLTRB(I)**2
+                        AKSIG(I) = 0.88 * AMGT /(5.3 + AMGT)
+                     END IF
+                     IF (M3(I).EQ.14) ABR(I) = VELOS(I)*WAREA*AKSIG(I)
+     1                  /(498.*WT(I))*(CYBT(I) + CYBT0(I))
+                     IF (M3(I) .EQ. 15) 
+     1                  ABR(I) = (VELOS(I)*AST*SLOPE(I)/498.)*AKSIG(I)
+                     CUMM(J) = (ARNO1(I)*P1(I)*EXP(-DELTAY(J)/
+     1                         (AK1(I)*ABR(I)))
+     2                         +  ARNO2(I)*P2(I)*EXP(-DELTAY(J)/
+     3                         (AK2(I)*ABR(I)))) * T(I)
+                  CASE (10)
+                     STSMXM(I,J) = TABL1(J)
+                     STSMNM(I,J) = TABL2(J)
+                     CYCLSM(I,J) = TABL3(J)
+                     K = JEND
+                     AX = 1.0
+                     CYCLE
+                  CASE (11)
+                     STSMXM(I,J) = TABL4(J)
+                     STSMNM(I,J) = TABL5(J)
+                     CYCLSM(I,J) = TABL6(J)
+                     K = JEND
+                     AX = 1.0
+                     CYCLE
+                  CASE (12)
+                     STSMXM(I,J) = TABL7(J)
+                     STSMNM(I,J) = TABL8(J)
+                     CYCLSM(I,J) = TABL9(J)
+                     K = JEND
+                     AX = 1.0
+                     CYCLE
+                  CASE DEFAULT
+                     CUMM(J) = T(I) * TAB1(J)
+                  END SELECT
+                  CSUM(I,J) = CUMM(J)
+               END DO
+               K1(I) = K
+               IF (AX .NE. 1.0) THEN
+C                 CALCULATE CYCLES FOR Y MAX AND Y MIN.
+                  DO J = 1, K
+                     CYCLSM(I,J) = CUMM(J) - CUMM(J+1)
+                  END DO
+               END IF
+            END IF
 
-C     ESTABLISH MAX AND MIN RESPONSE VALUES AT MIDPOINTS BETWEEN
-C     SUCCESSIVE DELTA Y VALUES
-            DO 310 J = 1, K
-               write(8,*) 'start cycle 310'
-               AMIDY(J) = (DELTAY(J) + DELTAY(J + 1))/2.0
-               IF(IW3 .EQ. 1) GO TO 270
-               P(I) = 0.0
-  270          IF (N1FLAG(I) - 2) 280,280,290
-  280          YMAX(J) = D*(AM(I) + AMIDY(J)) + P(I)
-               IF (N1FLAG(I) .EQ. 2) GO TO 300
-               YMIN(J) = D*AM(I) + P(I)
-               IF (N1FLAG(I) . EQ. 1) GO TO 310
-  290          YMAX(J) = D*AM(I) + P(I)
-  300          YMIN(J) = D*(AM(I) - AMIDY(J)) + P(I)
-  310       CONTINUE
-            IF (M3(I) .LT. 13) GO TO 380
-            RHOO = 0.002378
-            RHO1 = SIG(I) * RHOO
-            IF (M3(I) .EQ. 14 .OR. M3(I) .EQ. 15) GO TO 380
-            VAR = 32.2 * AC * SLOPE(I) * RHO1
-            WLOAD = 2.0 * WT(I)/WAREA
-            FOUR = 4.0 * (WLOAD/VAR)
-            PAR = FOUR + (6.28 / SLOPE(I))
-            R1 = FOUR/PAR
-            XARG = SCLTRB(I) / AC
-            YARG = PAR
-            XARGMN = TKSIG(18)
-            YARGMN = TKSIG(2)
-            IF (XARG - XARGMN) 320, 330, 370
-  320       IF (YARG - YARGMN) 330, 350, 350
-  330       WRITE (6,340) XARG, YARG, NSEG
-  340       FORMAT ('GUST ALLEV. INTRP. ERROR X IS TOO SMALL. X =E14.6',
-     1      1X, 'Y IS TOO SMALL. Y = E14.6', 2X, 'SEG =', I2)
-  350       WRITE (6,360) XARG, NSEG
-  360       FORMAT ('GUST ALLEV. INTRP. ERROR, X IS TOO SMALL.'
-     1      ' X =E14.6', 2X, 'SEG = ', I2)
-  370       NSEG = I + 50
-            LEVEL = J
-            write(10,*) '1 I ',I
-            CALL TWOVIN (XARG, YARG, TKSIG, OUTPUT, NSEG, LEVEL)
-            write(9,*) 'AKSIG ',OUTPUT
-            AKSIG(I) = OUTPUT
-            AKSIG(I) = R1 * AKSIG(I)
-  380       DO 520 J = 1, JEND
-C              CALCULATE THE CUMULATIVE CYCLES GIVEN VALUES OF DELTA Y
-               write(8,*) 'start cycle 520'
-               IF (M3(I) .EQ. 13) GO TO 460
-               IF ((M3(I) .EQ. 14) .OR. (M3(I) .EQ. 15)) GO TO 455
-               M1 = M3(I)
-               GO TO (390,400,410,420,430,440,450,460,470,480,490,500),
-     1                M1
-  390          CUMM(J) = T(I) * TAB1(J)
-               write(9,*) '390'
-               IF (I.EQ.27 .AND. ICASE.EQ.2) write(16,*) '390',ICASE,I,CUMM(J)
-               GO TO 510
-  400          CUMM(J) = T(I) * TAB2(J)
-               write(9,*) '400'
-               IF (I.EQ.27 .AND. ICASE.EQ.2) write(16,*) '400',ICASE,I,CUMM(J)
-               GO TO 510
-  410          CUMM(J) = T(I) * TAB3(J)
-               write(9,*) '410'
-               IF (I.EQ.27 .AND. ICASE.EQ.2) write(16,*) '410',ICASE,I,CUMM(J)
-               GO TO 510
-  420          CUMM(J) = T(I) * TAB4(J)
-               write(9,*) '420'
-               IF (I.EQ.27 .AND. ICASE.EQ.2) write(16,*) '420',ICASE,I,CUMM(J)
-               GO TO 510
-  430          CUMM(J) = T(I) * TAB5(J)
-               write(9,*) '430'
-               IF (I.EQ.27 .AND. ICASE.EQ.2) write(16,*) '430',ICASE,I,CUMM(J)
-               GO TO 510
-  440          CUMM(J) = T(I) * TAB6(J)
-               write(9,*) '440'
-               IF (I.EQ.27 .AND. ICASE.EQ.2) write(16,*) '440',ICASE,I,CUMM(J)
-               GO TO 510
-  450          CUMM(J) = (ARNO1(I)*EXP(-DELTAY(J)**2/
-     1                   (2.0*(SGMAX1(I))**2))
-     2                 +  ARNO2(I)*EXP(-DELTAY(J)**2/
-     3                   (2.0*(SGMAX2(I))**2))
-     4                 +  ARNO3(I)*EXP(-DELTAY(J)**2/
-     5                   (2.0*(SGMAX3(I))**2))) *  T(I)
-               write(9,*) '450'
-               IF (I.EQ.27 .AND. ICASE.EQ.2) write(16,*) '450',ICASE,I,CUMM(J)
-               GO TO 510
-  460          ABR(I) = (VELOS(I)*SLOPE(I)*WAREA*AKSIG(I))/(498.0*WT(I))
-               write(9,*) 'I,J,ABR1,ABR2',i,j,VELOS(I),SLOPE(I),WAREA,
-     1         AKSIG(I),(VELOS(I)*SLOPE(I)*WAREA*AKSIG(I)),(498.0*WT(I))
-               GO TO 470
-  455          CONTINUE
-  465          AMGT = (2*WT(I)/(RHO1*CBART*32.2*SLOPE(I)*AST)*
-     1                (YAW(I)/WT(I))) / SCLTRB(I)**2
-               AKSIG(I) = 0.88 * AMGT /(5.3 + AMGT)
-               IF(M3(I) .EQ. 15) GO TO 466
-               ABR(I) = VELOS(I)*WAREA*AKSIG(I)/(498.*WT(I))*(CYBT(I) + 
-     1                  CYBT0(I))
-               GO TO 470
-  466          ABR(I) = (VELOS(I) * AST *SLOPE(I)/ 498.) * AKSIG(I)
-               write(9,*) '466'
-  470         znam1=(AK1(I)*ABR(I))
-              znam2=(AK2(I)*ABR(I))
-              cumm1(j)=0.0
-              if (abs(znam1).gt.1e-9)
-     1        CUMM1(J)=ARNO1(I)*P1(I)*EXP(-DELTAY(J)/(AK1(I)*ABR(I)))
-              cumm2(j)=0.0
-              if (abs(znam2).gt.1e-9)
-     1        CUMM2(J)=ARNO2(I)*P2(I)*EXP(-DELTAY(J)/(AK2(I)*ABR(I)))
-               !cumm(j)=(cumm1(j)+cumm2(j))*t(i)
-               CUMM(J) = (ARNO1(I)*P1(I)*EXP(-DELTAY(J)/
-     1                   (AK1(I)*ABR(I)))
-     2                 +  ARNO2(I)*P2(I)*EXP(-DELTAY(J)/
-     3                   (AK2(I)*ABR(I)))) * T(I)
-               write(9,*) '470'
-               IF (I.EQ.27 .AND. ICASE.EQ.2) write(16,*) '470',ICASE,I,CUMM(J)
-               GO TO 510
-  480          STSMXM(I,J) = TABL1(J)
-               STSMNM(I,J) = TABL2(J)
-               CYCLSM(I,J) = TABL3(J)
-               K = JEND
-               AX = 1.0
-               GO TO 520
-  490          STSMXM(I,J) = TABL4(J)
-               STSMNM(I,J) = TABL5(J)
-               CYCLSM(I,J) = TABL6(J)
-               K = JEND
-               AX = 1.0
-               GO TO 520
-  500          STSMXM(I,J) = TABL7(J)
-               STSMNM(I,J) = TABL8(J)
-               CYCLSM(I,J) = TABL9(J)
-               K = JEND
-               AX = 1.0
-               GO TO 520
-  510          CSUM(I,J) = CUMM(J)
-  520       CONTINUE
-            write(9,*) 'CUMM:',CUMM
-            write(9,*) 'CUMM1:',CUMM1
-            write(9,*) 'CUMM2:',CUMM2
-            write(9,*) 'ABR:',ABR
-            write(9,*) 'DELTAY:',DELTAY
-            K1(I) = K
-            IF(AX .EQ. 1.0) GO TO 540
-C     CALCULATE CYCLES FOR Y MAX AND Y MIN.
-            DO 530 J = 1, K
-               CYCLSM(I,J) = (CUMM(J) - CUMM(J+1))
-  530       CONTINUE
-  540       DO 940 J = 1, K
-               write(8,*) 'start cycle 940'
-               IF(B .EQ. 1.0) GO TO 800
-               IF(AX .EQ. 1.0) GO TO 720
-C     SELECT WHETHER TO ENTER OR NOT TO ENTER THE STRESS TABLES.
-C     SELECTION IS MADE BY ISTRES FLAG.
-               IF (ISTRES(I) .LT. 1) GO TO 610
-  550          NFLAG = 1
-               ARGUMT = YMAX(J)
-  560          M2 = ISTRES(I)
-               M2 = (31 * M2) - 30
-               DO 570 ITAB = 1, 31
-                  M20 = ITAB + M2 - 1
-  570          TBLLD(ITAB) = TBLM2(M20)
-C     SUBROUTINE ONEVAR- GIVEN A VALUE OF RESPONSE Y, INTERPOLATE IN
-C     STRESS TABLES FOR A VALUE OF STRESS
-               NSEGNM = I
-               CALL ONEVAR (ARGUMT, TBLLD, OUTPUT, NSEGNM)
-  580          GO TO(590,600), NFLAG
-  590          STSMXM(I,J) = OUTPUT
-               write(9,*) '590, I, STSMXM',I,STSMXM
-               NFLAG = 2
-               ARGUMNT = YMIN(J)
-               GO TO 560
-  600          STSMNM(I,J) = OUTPUT
-               GO TO 620
-C     WHEN STRESS TABLES ARE NOT USED, SET RESPONSE Y = STRESS
-  610          STSMXM(I,J) = YMAX(J)
-               write(9,*) '610, I, STSMXM',I,STSMXM
-               STSMNM(I,J) = YMIN(J)
-C     TEST TO ESTABLISH TRUE MAX AND MIN STRESS VALUES.
-C     ALGEBRAICALLY, MAX STRESS GREATER THAN MIN STRESS.
-  620          IF (STSMXM(I,J))640,630,630
-  630          IF (STSMNM(I,J))720,660,660
-  640          IF (STSMNM(I,J))650,670,670
-  650          IF (ABS(STSMXM(I,J))-ABS(STSMNM(I,J)))690,690,670
-  660          IF (STSMXM(I,J) - STSMNM(I,J))670,680,680
-  670          SAVE = STSMXM(I,J)
-               STSMXM(I,J) = STSMNM(I,J)
-               STSMNM(I,J) = SAVE
-  680          IF (STSMXM (I,J) - 0.0) 690,690,720
-  690          DMAGEM(J) = 0.0
-               CYC(J) = 0.0
-               CDAMG(J) = 0.0
-               IF (B .EQ. 1.0) GO TO 1540
-               IF (INTPER . EQ. 0) GO TO 940
-               IF (YARG - YARGMN) 700,940,940
-  700          NSEG = I
-               LEVEL = J
-               WRITE (6,710) XARG, YARG, NSEG, LEVEL
-  710          FORMAT ('SN, INTP ERROR X IS TOO SMALL X = ',E14.6, 1X,
-     1         'Y IS TOO SMALL Y = ',E14.6, 1X, 'SEG =', I2, 1X,
-     2         'LOAD LEVEL =', I2, 1X, 'DAMAGE SET = 0.0')
-               INTPER = 0
-               GO TO 940
-C     FORM INTERPOLATING ARGUMENTS TO CALULATE CYCLES TO FAILURE
-C     FROM S-N DATA
-  720          IF (IA(I) - 6) 740,740,730
-  730          IF ((IA(I) .GT. 12) .AND. (IA(I) .LT. 19)) GO TO 750
-  740          XARG = (STSMXM(I,J) / SIGULT)
-               IF (IA(I) - 6) 760,760,770
-  750          XARG = ((STSMXM(I,J) - STSMNM(I,J)) / (2.0 * SIGULT))
-               IF (IA(I) -18) 770,770,780
-  760          YARG = (STSMNM(I,J) / STSMXM (I,J))
-               GO TO 790
-  770          IF(IA(I) .GT. 18)  GO TO 780
-               YARG = ((STSMXM(I,J) + STSMNM(I,J)) / (2.0 * SIGULT))
-               GO TO 790
-  780          YARG = (STSMNM(I,J) / SIGULT)
-  790          IF (IA(I) .LT. 7) I2 = IA(I)
-               IF ((IA(I) .GT. 6) .AND. (IA(I) .LT. 19)) I2 
-     1            = (IA(I) -12)
-               IF (IA(I) .GT. 18) I2 = (IA(I) -18)
-               ICALL = I2
-  800          I2 = (257 *I2) - 256
-               DO 810 ISETTB = 1, 257
+            DO J = 1, K
+               IF(B .NE. 1.0) THEN
+                  IF (AX .NE. 1.0) THEN
+                     !SELECT WHETHER TO ENTER OR NOT TO ENTER THE STRESS TABLES.
+                     !SELECTION IS MADE BY ISTRES FLAG.
+                     IF (ISTRES(I) .GE. 1) THEN
+                        DO I1V=1,2
+                           IF (I1V.EQ.1) THEN
+                              ARGUMT = YMAX(J)
+                           ELSE
+                              ARGUMT = YMIN(J)
+                           END IF
+                           M2 = ISTRES(I)
+                           M2 = (31 * M2) - 30
+                           DO ITAB = 1, 31
+                              M20 = ITAB + M2 - 1
+                              TBLLD(ITAB) = TBLM2(M20)
+                           END DO
+                           !SUBROUTINE ONEVAR- GIVEN A VALUE OF RESPONSE Y, INTERPOLATE IN
+                           !STRESS TABLES FOR A VALUE OF STRESS
+                           NSEGNM = I
+                           CALL ONEVAR (ARGUMT, TBLLD, OUTPUT, NSEGNM)
+                           IF (I1V.EQ.1) THEN
+                              STSMXM(I,J) = OUTPUT
+                           ELSE
+                              STSMNM(I,J) = OUTPUT
+                           END IF
+                        END DO
+                     ELSE
+                        !WHEN STRESS TABLES ARE NOT USED, SET RESPONSE Y = STRESS
+                        STSMXM(I,J) = YMAX(J)
+                        STSMNM(I,J) = YMIN(J)
+                     END IF
+                     !TEST TO ESTABLISH TRUE MAX AND MIN STRESS VALUES.
+                     !ALGEBRAICALLY, MAX STRESS GREATER THAN MIN STRESS.
+                     STSMAX=AMAX1(STSMXM(I,J),STSMNM(I,J))
+                     STSMIN=AMIN1(STSMXM(I,J),STSMNM(I,J))
+                     STSMXM(I,J)=STSMAX
+                     STSMNM(I,J)=STSMIN
+                     IF (STSMXM (I,J) .LE. 0.0) THEN
+  690                   DMAGEM(J) = 0.0
+                        CYC(J) = 0.0
+                        CDAMG(J) = 0.0
+                        IF (B .EQ. 1.0) GO TO 1540
+                        IF (INTPER . EQ. 0) CYCLE
+                        IF (YARG .GE. YARGMN) CYCLE
+                        NSEG = I
+                        LEVEL = J
+                        WRITE (6,710) XARG, YARG, NSEG, LEVEL
+                        INTPER = 0
+                        CYCLE
+                     END IF
+                  END IF
+                  !FORM INTERPOLATING ARGUMENTS TO CALULATE CYCLES TO FAILURE
+                  !FROM S-N DATA
+                  SELECT CASE (IA(I))
+                     CASE (:6)
+                        XARG = (STSMXM(I,J) / SIGULT)
+                        YARG = (STSMNM(I,J) / STSMXM (I,J))
+                        I2 = IA(I)
+                     CASE (7:12)
+                        XARG = (STSMXM(I,J) / SIGULT)
+                        YARG = (STSMXM(I,J)+STSMNM(I,J)) /(2.0*SIGULT)
+                        I2= IA(I) - 12
+                     CASE (13:18)
+                        XARG = (STSMXM(I,J)-STSMNM(I,J)) /(2.0*SIGULT)
+                        YARG = (STSMXM(I,J)+STSMNM(I,J)) /(2.0*SIGULT)
+                        I2= IA(I) - 12
+                     CASE (19:)
+                        XARG = (STSMXM(I,J) / SIGULT)
+                        YARG = (STSMNM(I,J) / SIGULT)
+                        I2= IA(I) - 18
+                  END SELECT
+                  ICALL = I2
+               END IF
+
+               I2 = (257 *I2) - 256
+               DO ISETTB = 1, 257
                   I10 = ISETTB +I2 -1
-  810          TBLSN(ISETTB) = TBLI2(I10)
+                  TBLSN(ISETTB) = TBLI2(I10)
+               END DO
                XARGMN = TBLSN(18)
                YARGMN = TBLSN(2) - 0.001
-  820          IF (XARG - XARGMN) 830,840,840
-  830          INTPER = 1
-               GO TO 690
-  840          NSEG = 1
+               IF (XARG .LT. XARGMN) THEN
+                  INTPER = 1
+               ELSE
+                  GO TO 690
+               END IF
+               NSEG = 1
                LEVEL = J
                IF (B .EQ. 1.0) NSEG = 50
-C     SUBROUTINE TWOVIN - LINEAR - QUADRATIC INTERPOLATION OF S-N DATA.
-C     GIVEN THE INTERPOLATING VALUES XARG AND YARG, INTERPOLATE FOR A
-C     VALUE OF CYCLES TO FAILURE.
-               write(10,*) '2 I ',I
+               ! SUBROUTINE TWOVIN - LINEAR - QUADRATIC INTERPOLATION OF S-N DATA.
+               ! GIVEN THE INTERPOLATING VALUES XARG AND YARG, INTERPOLATE FOR A
+               ! VALUE OF CYCLES TO FAILURE.
                CALL TWOVIN (XARG, YARG, TBLSN, OUTPUT, NSEG, LEVEL)
-  850          GO TO (860,870,880,890,900,910), ICALL
-  860          ALIFE = AL1
-               GO TO 920
-  870          ALIFE = AL2
-               GO TO 920
-  880          ALIFE = AL3
-               GO TO 920
-  890          ALIFE = AL4
-               GO TO 920
-  900          ALIFE = AL5
-               GO TO 920
-  910          ALIFE = AL6
-  920          IF (B .EQ. 1.0) GO TO 1530
+               SELECT CASE (ICALL)
+                  CASE (1)
+                  ALIFE = AL1
+                  CASE (2)
+                  ALIFE = AL2
+                  CASE (3)
+                  ALIFE = AL3
+                  CASE (4)
+                  ALIFE = AL4
+                  CASE (5)
+                  ALIFE = AL5
+                  CASE (6)
+                  ALIFE = AL6
+                  CASE DEFAULT
+                  ALIFE = AL1
+               END SELECT
+               IF (B .EQ. 1.0) GO TO 1530
                ALIFE = ALOG10(ALIFE)
-               IF (OUTPUT - ALIFE) 930,690,690
-  930          CYC(J) = 10** OUTPUT
-               write(9,*) 'OUTPUT,ALIFE',OUTPUT,ALIFE
-C     FORM THE RATIO DAMAGE = CYCLES EXPERIENCED AT TA GIVEN RESPONSE
-C     LEVEL / CYCLES TO FAILURE AT THE RESPONSE LEVEL.
+               IF (OUTPUT .LT. ALIFE) THEN
+                  CYC(J) = 10** OUTPUT
+               ELSE
+                  GOTO 690
+               END IF
+               !FORM THE RATIO DAMAGE = CYCLES EXPERIENCED AT A GIVEN RESPONSE
+               !LEVEL / CYCLES TO FAILURE AT THE RESPONSE LEVEL.
                DMAGEM(J) = CYCLSM(I,J) / CYC(J)
-C     SUM THE DAMAGE DUE TO EAH LOAD INCREMET WITHIN ONE SEGMENT.
+
+               !SUM THE DAMAGE DUE TO EAH LOAD INCREMET WITHIN ONE SEGMENT.
                CDMGM(I) = CDMGM(I) + DMAGEM(J)
                CDAMG(J) = CDMGM(I)
-  940       CONTINUE
-C     SUM THE DAMAGE OF ALL SEGMENTS.
+            END DO
+
+            !SUM THE DAMAGE OF ALL SEGMENTS.
             TCDMGM = TCDMGM + CDMGM(I)
-C                      WRITE TAP FOR
-C              SPECTRUM LOADING RANDOM SEQUENCE GENERATION PROGRAM
+
+            !WRITE TAP FOR SPECTRUM LOADING RANDOM SEQUENCE GENERATION PROGRAM
             JJEND = JEND - 1
             IF ((M3(I) .GT. 9) .AND. (M3(I) .LT. 13)) JJEND = JEND
             WRITE (1)JJEND, (STSMXM(I,J), STSMNM(I,J), CYCLSM(I,J), 
      1             J = 1, JJEND)
-            IF (IW2 .EQ. 2) GO TO 1070
+
+            IF (IW2 .EQ. 2) CYCLE
             WLPRNT = 1.0
-            IF (IW5 .LT. 2) GO TO 950
-            IF (I -1) 960,960,950
-  950       WRITE (6,100) IRR, ICASE
-  960       WRITE (6,970) I
-  970       FORMAT(4X, 'SEGMENT =', I2)
+            IF (IW5 .LT. 2 .OR. I.GT.1)  WRITE (6,100) IRR, ICASE
+            WRITE (6,970) I
             WRITE (6,980)
-  980       FORMAT ('--------------------------SPECTRUM-------------'
-     1      '-------------------', 2X, '------------DAMAGE CALCULATION'
-     2      '------------')
             WRITE (6,990)
-  990       FORMAT (5X, 1HJ, 3X, 'DELTA Y', 3X,
-     1      'CUMULATIVE CYCLES', 2X, 'MAX STRESS', 2X 'MIN STRESS',
-     2      8X, 'CYCLES', 10X, 'ALLOWABLE', 8X, 'DAMAGE', 2X,
-     3      'CUM DAMAGE')
-            DO 1050 J = 1, JEND
-               IF ((M3(I) .GT. 9) .AND. (M3(I) .LT. 13)) GO TO 1010
-               WRITE (6,1000) J, DELTAY(J), CUMM(J)
- 1000          FORMAT (1H, 4X, I2, F13.3,1X,F16.4)
-               IF (J . EQ. JEND) GO TO 1050
-               IF ((M3(I) .LT. 10) .OR. (M3(I) .EQ. 13)) GO TO 1030
-               IF ((M3(I) .EQ. 14) .OR. (M3(I) .EQ. 15)) GO TO 1030
- 1010          WRITE (6,1020) J, STSMXM(I,J), STSMNM(I,J), CYCLSM(I,J), 
+            DO J = 1, JEND
+               IF ((M3(I) .LE. 9) .OR. (M3(I) .GE. 13))
+     1            WRITE (6,1000) J, DELTAY(J), CUMM(J)
+               IF (J . EQ. JEND) CYCLE
+               IF ((M3(I).GT.9).AND.(M3(I).LT.13).OR.M3(I).GT.15) THEN
+                  WRITE(6,1020) J,STSMXM(I,J),STSMNM(I,J),CYCLSM(I,J),
      1                        CYC(J), DMAGEM(J), CDAMG(J)
- 1020          FORMAT (1H , 4X, I2, 32X, F10.0, 2X, F10.0, 2X, F16.4, 
-     1                 2X, F16.0, 1X, F11.7, 1X, F11.7)
- 1030          WRITE (6,1040) STSMXM(I,J), STSMNM(I,J), CYCLSM(I,J), 
+               ELSE
+                  WRITE (6,1040) STSMXM(I,J), STSMNM(I,J), CYCLSM(I,J), 
      1                        CYC(J), DMAGEM(J), CDAMG(J)
- 1040          FORMAT (38X, F10.0, 2X, F10.0, 2X, F16.4, 2X, F16.0,
-     1         1X, F11.7, 1X, F11.7)
- 1050       CONTINUE
+               END IF
+            END DO
             IF ((M3(I) .EQ. 8) .OR. (M3(I) .EQ. 9)) WRITE (6,1060) 
      1          AKSIG(I), ABR(I)
             IF ((M3(I) .GE. 13) .AND. (M3(I) .LE. 15)) WRITE (6,1060)
      1          AKSIG(I), ABR(I)
- 1060       FORMAT ( 5X, 'GUST ALLEVIATION FACTOR = ',F9.6, 5X,
-     1      'A-BAR = ', F16.6)
- 1070    ABC(I) = TCDMGM
-         write(8,*) 'end cycle 1070'
-         close(9)
- 1080    IF (I4. EQ. 0) GO TO 1615
-         CUMDMG = 0.0
-         CUMXN = 0.0
-         JSUM = 0
-         TSUM = 0
-         I = 0
-         J = 0
-         M = 0
-         K = 0
-         K4 = 0
-         K5 = 0
-         DO 1160 I = 1, KEND
-            write(8,*) 'start cycle 1160'
-            IF (N6(I) -1)1160,1130,1090
- 1090       IF (K4 - 0)1110,1110,1100
- 1100       IF (K5 -0)1110,1110,1120
- 1110       K = 0
- 1120       K = K5
-            K = K + 1
-            QMAX(K) = STSMXM(I,J)
-            JX(K) = CYCLSM(I,J)
-            K5 = K
-            GO TO 1160
- 1130       IF (K - K4)1140,1150,1140
- 1140       K = K4
- 1150       K = K + 1
-            QMIN(K) = STSMNM(I,J)
-            JI(K) = CYCLSM(I,J)
-            K4 = K
- 1160    CONTINUE
-         close(8)
-         IF (IW1 .EQ.2) GO TO 1200
-         WLPRNT = 1.0
-         WRITE (6,100) IRR, ICASE
-         WRITE (6,1170)
+            ABC(I) = TCDMGM
+         END DO
+
+         IF (I4 .NE. 0) THEN
+            CUMDMG = 0.0
+            CUMXN = 0.0
+            JSUM = 0
+            TSUM = 0
+            I = 0
+            J = 0
+            M = 0
+            K = 0
+            K4 = 0
+            K5 = 0
+            DO I = 1, KEND
+               N8=K1(I)
+               DO J = 1, N8
+                  IF (N6(I) .LT. 1) CYCLE
+                  IF (N6(I) .GT. 1) THEN
+                     K = K5 + 1
+                     QMAX(K) = STSMXM(I,J)
+                     JX(K) = CYCLSM(I,J)
+                     K5 = K
+                  ELSE
+                     K = K4 + 1
+                     QMIN(K) = STSMNM(I,J)
+                     JI(K) = CYCLSM(I,J)
+                     K4 = K
+                  END IF
+               END DO
+            END DO
+            
+            IF (IW1 .NE.2) THEN
+               WLPRNT = 1.0
+               WRITE (6,100) IRR, ICASE
+               WRITE (6,1170)
+               WRITE (6,1180)
+               WRITE (6,1190)
+            END IF
+            IF (K4 .LE. K5) THEN
+               K = K5
+               ILINE = 0
+            ELSE
+               K = K4
+               ILINE = 0
+            END IF
+            DO I = 1, K
+               IF (JSUM .LT. NEND) THEN
+                  !SORT MAX ARRAY INTO DESCENDING ORDER.
+                  DO J = I, K5
+                     IF (QMAX(I) .GE. QMAX(J)) CYCLE
+                     ST = QMAX(I)
+                     QMAX(I) = QMAX(J)
+                     QMAX(J) = ST
+                     JT = JX(I)
+                     JX(I) = JX(J)
+                     JX(J) = JT
+                     JOUT = I
+                  END DO
+                  JSUM = JSUM + JX(I)
+                  IF (JSUM .GE. NEND) THEN
+                     JX(JOUT) = JX(JOUT) - (JSUM - NEND)
+                     JSUM = JSUM - (JSUM - NEND)
+                  END IF
+                  IF (IW1 .NE. 2) THEN
+                     WRITE (6,1270) QMAX(I), JX(I), JSUM
+                     IF (K4 .LE. K5) THEN
+                        ILINE = ILINE + 1
+                        IF (ILINE .GE. 28) THEN
+                           ILINE = 0
+                           WRITE (6,100) IRR, ICASE
+                           WRITE (6,1170)
+                           WRITE (6,1190)
+                        END IF
+                     END IF
+                  END IF
+               END IF
+               IF (ISUM .GE. NEND) CYCLE
+               !SORT MIN ARRAY INTO ASCENDING ORDER
+               DO J = I, K4
+                  IF (QMIN(I) .LE. QMIN(J)) CYCLE
+                  ST = QMIN(I)
+                  QMIN(I) = QMIN(J)
+                  QMIN(J) = ST
+                  JT = JI(I)
+                  JI(I) = JI(J)
+                  JI(J) = JT
+                  IOUT = I
+               END DO
+               ISUM = ISUM + JI(I)
+               IF (ISUM .GE. NEND) THEN
+                  JI(IOUT) = JI(IOUT) - (ISUM - NEND)
+                  ISUM = ISUM - (ISUM - NEND)
+               END IF
+               IF (IW2 .EQ. 2) CYCLE
+               WRITE (6,1350) QMIN(I), JI(I), ISUM
+               IF (K4 .LE. K5) CYCLE
+               ILINE = ILINE + 1
+               IF (ILINE .GE. 28) THEN
+                  ILINE = 0
+                  WRITE (6,100) IRR, ICASE
+                  WRITE (6,1170)
+                  WRITE (6,1190)
+               END IF
+            END DO
+            L = 1
+            M = 1
+            !FORM INTERPOLATING ARGUMENT TO CALCULATE CYCLES TO FAILURE
+            !FROM S-N DATA
+            IF (IW1 .NE. 2) THEN
+               ILINE = 0
+               WRITE (6,100) IRR, ICASE
+               WRITE (6,1410)
+               WRITE (6,1420)
+            END IF
+            
+            DO WHILE (.TRUE.)
+               SELECT CASE (I4)
+                  CASE (:6)
+                     XARG = QMAX(L) / SIGULT
+                     YARG = QMIN(M) / QMAX(L)
+                  CASE (7:12)
+                     XARG = QMAX(L) / SIGULT
+                     YARG = (QMAX(L) + QMIN(M)) / (2.0*SIGULT)
+                  CASE (13:18)
+                     XARG = (QMAX(L) - QMIN(M)) / (2.0*SIGULT)
+                     YARG = (QMAX(L) + QMIN(M)) / (2.0*SIGULT)
+                  CASE (19:)
+                     XARG = QMAX(L) / SIGULT
+                     YARG = QMIN(M) / SIGULT
+               END SELECT
+               IF (I4 .LT. 7) I2 = I4
+               IF ((I4 .GT. 6) .AND. (I4 .LT. 13)) I2 = (I4 -6)
+               IF ((I4 .GT. 12) . AND. (I4 .LT. 19)) I2 = (I4 -12)
+               IF (I4 .GT. 18) I2 = (I4 -18)
+               ICALL = I2
+               IF (JX(L) .LT. JI(M)) THEN
+                  JI(M) = JI(M) - JX(L)
+                  XN = JX(L)
+                  A = 1.0
+               ELSE
+                  JX(L) = JX(L) - JI(M)
+                  XN = JI(M)
+                  A = 0.0
+               END IF
+               CUMXN = CUMXN + XN
+               B = 1.0
+               GO TO 120
+               
+ 1530          ALIFE = ALOG10(ALIFE)
+               IF (OUTPUT .GE. ALIFE) THEN
+ 1540             DMG = 0.0
+                  CYF = 0.0
+               END IF
+               IF (YARG .LT. YARGMN) THEN
+                  IF (OUTPUT.GE.ALIFE) WRITE (6,1550) XARG, YARG
+                  CYF = 10.0 ** OUTPUT
+                  DMG = XN / CYF
+               END IF
+               CUMDMG = CUMDMG + DMG
+               
+               IF (IW1 .NE. 2) THEN
+                  WRITE(6,1580)
+     1            QMAX(L),QMIN(M),XN,CUMXN,YART,CYF,DMG,CUMDMG
+                  ILINE = ILINE + 1
+                  IF (ILINE .GE. 54) THEN
+                     ILINE = 0
+                     WRITE (6,100) IRR, ICASE
+                     WRITE (6,1410)
+                     WRITE (6,1420)
+                  END IF
+               END IF
+               IF ((L .EQ. JOUT) .AND. (M .EQ. IOUT)) EXIT
+               IF ((JX(L) .EQ. 0.0) .AND. (A .EQ. 0.0)) L = L + 1
+               IF (A .EQ. 1.0) L = L + 1
+               IF (A .EQ. 0.0) M = M + 1
+            END DO
+            
+            !CALCULATION OF TOTAL DAMAGE INCLUDING GAG
+            TCDMGM = TCDMGM + CUMDMG
+         END IF
+         IF (IW4 .NE. 2) THEN
+            CALL SPECSM
+            WLPRNT = 1.0
+         END IF
+         IF (WLPRNT .NE. 0.0) THEN
+            WRITE (6,100) IRR, ICASE
+            WRITE (6, 1630)
+            WRITE (6,1640)
+         ELSE
+            WRITE (6,1630)
+            WRITE (6,1660)
+         END IF
+         WRITE (6,1680) (I, CDMGM(I), ABC(I), I = 1, IEND)
+         IF (I4 .NE. 0) WRITE (6,1690) CUMDMG, TCDMGM
+         IF (II .EQ. 1) GO TO 85  ! PSV 90 -> 85
+
+         RETURN
+   10    FORMAT (I3, I3)
+C  20    FORMAT (13A6)  ! PSV 
+   20    FORMAT (13A4)  ! PSV
+   30    FORMAT ('1')
+   40    FORMAT (13A4)
+  100    FORMAT ('REFERENCE RUN NO.', I6, 4X, 'CASE NO', I6)
+  340    FORMAT (
+     1   'GUST ALLEV. INTRP. ERROR X IS TOO SMALL. X ='
+     2    ,E14.6,1X,'Y IS TOO SMALL. Y =',E14.6, 2X,
+     3   'SEG =', I2)
+  360    FORMAT (
+     1   'GUST ALLEV. INTRP. ERROR, X IS TOO SMALL.'
+     2   ' X =',E14.6, 2X, 'SEG = ', I2)
+  710    FORMAT ('SN, INTP ERROR X IS TOO SMALL X = ',E14.6, 1X,
+     1   'Y IS TOO SMALL Y = ',E14.6, 1X, 'SEG =', I2, 1X,
+     2   'LOAD LEVEL =', I2, 1X, 'DAMAGE SET = 0.0')
+  970    FORMAT(4X, 'SEGMENT =', I2)
+  980    FORMAT ('--------------------------SPECTRUM-------------'
+     1   '-------------------', 2X, '------------DAMAGE CALCULATION'
+     2   '------------')
+  990    FORMAT (5X, 1HJ, 3X, 'DELTA Y', 3X,
+     1   'CUMULATIVE CYCLES', 2X, 'MAX STRESS', 2X 'MIN STRESS',
+     2   8X, 'CYCLES', 10X, 'ALLOWABLE', 8X, 'DAMAGE', 2X,
+     3   'CUM DAMAGE')
+ 1000    FORMAT (1H, 4X, I2, F13.3,1X,F16.4)
+ 1020    FORMAT (1H , 4X, I2, 32X, F10.0, 2X, F10.0, 2X, F16.4, 
+     1           2X, F16.0, 1X, F11.7, 1X, F11.7)
+ 1040    FORMAT (38X, F10.0, 2X, F10.0, 2X, F16.4, 2X, F16.0,
+     1   1X, F11.7, 1X, F11.7)
+ 1060    FORMAT ( 5X, 'GUST ALLEVIATION FACTOR = ',F9.6, 5X,
+     1   'A-BAR = ', F16.6)
  1170    FORMAT ('MAX AND MIN STRESSES AND CYCLE ARRAYS FORMED FOR'
      1           'THE DEFINITION OF THE GAG CYCLES')
-         WRITE (6,1180)
  1180    FORMAT ('ARRAYS ARE FROMED FROM SEGMENTS AS SPECIFIED BY'
      1           'FLAG = N6.')
-         WRITE (6,1190)
  1190    FORMAT (4X, 'MAX STRESS', 10X, 'CYCLES', 10X, 'CUM CYCLES',
      1   10X, 'MIN STRESS', 10X, 'CYCLES', 10X, 'CUM CYCLES')
- 1200    IF (K4 - K5) 1210,1210,1220
- 1210    K = K5
-         ILINE = 0
-         GO TO 1230
- 1220    K = K4
-         ILINE = 0
- 1230    DO 1290 I = I, K
-         IF (JSUM .GE. NEND) GO TO 1300
-C     SORT MAX ARRAY INTO DESCENDING ORDER.
-         DO 1240 J = I, K5
-            write(8,*) 'start cycle 1240'
-            IF (QMAX(I) .GE. QMAX(J)) GO TO 1240
-            ST = QMAX(J)
-            QMAX(I) = QMAX(J)
-            QMAX(J) = ST
-            JT = JX(I)
-            JX(I) = JX(J)
-            JX(J) = JT
- 1240    JOUT = I
-         JSUM = JSUM + JX(I)
-         IF (JSUM - NEND)1260,1250,1250
- 1250    JX(JOUT) = JX(JOUT) - (JSUM - NEND)
-         JSUM = JSUM - (JSUM - NEND)
- 1260    IF (IW1 .EQ. 2) GO TO 1300
-         WRITE (6,1270) QMAX(I), JX(I), JSUM
- 1270    FORMAT (4X, F10.0, 4X, F16.4, 3X, F16.4)
-         IF (K4 - K5) 1250,1280,1280
- 1280    ILINE = ILINE + 1
-         IF (ILINE - 28)1300,1290,1290
- 1290    ILINE = 0
-         WRITE (6,100) IRR, ICASE
-         WRITE (6,1170)
-         WRITE (6,1190)
- 1300    IF (ISUM .GE. NEND) GO TO 1390
-C     SORT MIN ARRAY INTO ASCENDING ORDER
-         DO 1310 J = I, K4
-            write(8,*) 'start cycle 1310'
-            IF (QMIN(I) .LE. QMIN(J)) GO TO 1310
-            ST = QMIN(I)
-            QMIN(I) = QMIN(J)
-            QMIN(J) = ST
-            JT = JI(I)
-            JI(I) = JI(J)
-            JI(J) = JT
- 1310    ICUT = I
-         ISUM = ISUM + JI(I)
-         IF (ISUM - NEND) 1330,1320,1320
- 1320    JI(IOUT) = JI(IOUT) - (ISUM - NEND)
-         ISUM = ISUM - (ISUM - NEND)
- 1330    IF (IW2 .EQ. 2) GO TO 1390
- 1340    WRITE (6,1350) QMIN(I), JI(I), ISUM
+ 1270       FORMAT (4X, F10.0, 4X, F16.4, 3X, F16.4)
  1350    FORMAT (60X, F10.0, 4X, F16.4, 3X, F16.4)
- 1360    IF (K4 - K5) 1390,1390,1370
- 1370    ILINE = ILINE + 1
-         IF (ILINE - 28)1390,1380,1380
- 1380    ILINE = 0
-         WRITE (6,100) IRR, ICASE
-         WRITE (6,1170)
-         WRITE (6,1190)
- 1390    CONTINUE
- 1400    L = 1
-         M = 1
-C     FORM INTERPOLATING ARGUMENT TO CALCULATE CYCLES TO FAILURE
-C     FROM S-N DATA
-         IF (IW1 .EQ. 2) GO TO 1430
-         ILINE = 0
-         WRITE (6,100) IRR, ICASE
-         WRITE (6,1410)
  1410    FORMAT (' GAG CYCLE SPECTRUM AND DAMAGE CALCULATION')
-         WRITE (6,1420)
  1420    FORMAT ( 5X, 'MAX', 7X, 'MIN STRESS', 9X, 'CYCLES',
      1   9X, 'CUM CYCLES', 9X, 'R', 8X, 'ALLOWABLE', 7X, 'DAMAGE',
      2   4X, 'CUM DAMAGE')
- 1430    IF (I4 - 6)1450,1450,1440
- 1440    IF ((I4 .GT. 12) .AND. (I4 .LT. 19)) GO TO 1460
- 1450    XARG = (QMAX(L) / SIGULT)
-         IF (I4 - 6)1470,1470,1480
- 1460    XARG = ((QMAX(L) - QMIN(M)) / (2.0 * SIGULT))
-         IF (I4 - 18)1480,1480,1490
- 1470    YARG = (QMIN(M) / QMAX(L))
-         GO TO 1500
- 1480    IF (I4 .GT. 18) GO TO 1490
-         YARG = ((QMAX(L) + QMIN(M)) / (2.0 * SIGULT))
- 1490    YARG = (QMIN(M) / SIGULT)
- 1500    IF (I4 .LT. 7) I2 = I4
-         IF ((I4 .GT. 6) .AND. (I4 .LT. 13)) I2 = (I4 -6)
-         IF ((I4 .GT. 12) . AND. (I4 .LT. 19)) I2 = (I4 -12)
-         IF (I4 .GT. 18) I2 = (I4 -18)
-         ICALL = I2
-         IF (JX(L) .GE. JI(M)) GO TO 1510
-         JI(M) = JI(M) - JX(L)
-         XN = JX(L)
-         A = 1.0
-         GO TO 1520
- 1510    JX(L) = JX(L) - JI(M)
-         XN = JI(M)
-         A = 0.0
- 1520    CUMXN = CUMXN + XN
-         B = 1.0
-         GO TO 120
- 1530    ALIFE = ALOG10(ALIFE)
-         IF (OUTPUT - ALIFE)1560,1540,1540
- 1540    DMG = 0.0
-         CYF = 0.0
-         IF (YARG .GE. YARGMN) GO TO 1570
-         WRITE (6,1550) XARG, YARG
  1550    FORMAT (' SN ITERP. ERROR. X IS TOO SMALL. X = E14.6',
      1   1X, 'Y IS TOO SMALL. Y = E14.6, 1X, DAMAGE IS SET = 0.0', 
      2   1X, '(GAG SEGMENT)')
- 1560    CYF = 10.0 ** OUTPUT
-         DMG = XN / CYF
- 1570    CUMDMG = CUMDMG + DMG
-         IF (IW1 .EQ. 2) GO TO 1600
-         WRITE (6,1580) QMAX(L), QMIN(M), XN, CUMXN, YART, CYF, DMG, 
-     1                  CUMDMG
  1580    FORMAT (2X, F15.0, 2X, F15.0, 2X, F16.4, 2X, F16.4, 1X, F7.3,
      1   2X, F16.0, 1X, F11.7, 1X, F11.7)
-         ILINE = ILINE + 1
-         IF (ILINE - 54)1600,1590,1590
- 1590    ILINE = 0
-         WRITE (6,100) IRR, ICASE
-         WRITE (6,1410)
-         WRITE (6,1420)
- 1600    IF ((L .EQ. JOUT) .AND. (M .EQ. IOUT)) GO TO 1610
-         IF ((JX(L) .EQ. 0.0) .AND. (A .EQ. 0.0)) L = L + 1
-         IF (A .EQ. 1.0) L = L + 1
-         IF (A .EQ. 0.0) M = M + 1
-         GO TO 1430
-C     CALCULATION OF TOTAL DAMAGE INCLUDING GAG
- 1610    TCDMGM = TCDMGM + CUMDMG
- 1615    CONTINUE
-         IF (IW4 . EQ. 2) GO TO 1620
-         CALL SPECSM
-         WLPRNT = 1.0
- 1620    IF (WLPRNT .EQ. 0.0) GO TO 1650
-         WRITE (6,100) IRR, ICASE
-         WRITE (6, 1630)
  1630    FORMAT ('INDIVIDUAL SEGMENT AND TOTAL DAMAGE SUMMARY')
-         WRITE (6,1640)
  1640    FORMAT ( 8X, 'SEG.', 7X, 'DAMAGE', 11X, 'TOTAL')
-         GO TO 1670
- 1650    WRITE (6,1630)
-         WRITE (6,1660)
  1660    FORMAT ( 8X, 'SEG.', 7X, 'DAMAGE', 11X, 'TOTAL')
- 1670    WRITE (6,1680) (I, CDMGM(I), ABC(I), I = 1, IEND)
  1680    FORMAT (9X, I2, F16.7, F16.7)
-         IF (I4 .EQ. 0) GO TO 1700
-         WRITE (6,1690) CUMDMG, TCDMGM
  1690    FORMAT (9X, 'GAG', F16.7, F16.7)
- 1700    IF (II .EQ. 1) GO TO 85  ! PSV 90 -> 85
-         RETURN
       END
 
       BLOCK DATA
@@ -699,7 +705,7 @@ C     CALCULATION OF TOTAL DAMAGE INCLUDING GAG
 
 
 
-         SUBROUTINE NPUT1B (CASE, NCASE, RAREA, IENTRY, IREF, ICAS, KP)
+         SUBROUTINE NPUT1A (CASE, NCASE, RAREA, IENTRY, IREF, ICAS, KP)
 C
 C     NPUT1A - STANDARD DATA INPUT
 C
@@ -984,7 +990,7 @@ C     TERMINATE WHEN ALL DATA HAS BEEN READ
      2                STSMNM(40,25)
             EQUIVALENCE (IEND, X(1)), (IRR, X(201)), (ICASE, X(202))
             EQUIVALENCE (M3, X(1673)), (N, X(1793)), (N2, X(3558))
-   10       FORMAT ('REFERENCE RUN NO.', I6, 4X, 'CASE NO.', I6)
+
             I = 1
             L = 0
             L5 = 0
@@ -999,79 +1005,96 @@ C     TERMINATE WHEN ALL DATA HAS BEEN READ
             MAXN(L) = N(I)
             M3(L) = M3(I)
             JEND = N(L)
-            DO 30 J = 1, JEND
+            DO J = 1, JEND
                K = K + 1
                DY(L,K) = DY(I,J)
-               CSUM(L,K) = CSUM(I,K)
+               CSUM(L,K) = CSUM(I,J)
                IF ((M3(I) .GT. 9) .AND. (M3(I) .LT. 13)) CSUM(L,K) = 
      1              CYCLSM(I,J)
-   30       CONTINUE
-   40       M = M + 1
-            M10 = 0
-            IF (N2(I) .EQ. 0) GO TO 130
-            IF (M - IEND)50,50,130
-   50       IF (N2(I) - N2(M)) 40,60,40
-   60       IF (I - M) 70,20,130
-   70       K = 0
-            IF (N(L) - N(M)) 80,110,100
-   80       N(L) = N(M)
-            M9 = 1
-            IF (MAXN(L) - N(M)) 90,110,110
-   90       MAXN(L) = N(M)
-            M10 = 1
-            GO TO 110
-  100       N(L) = N(M)
-            M9 = 2
-  110       JEND = N(L)
-            DO 120 J = 1, JEND
-               K = K + 1
-               IF ((M9 .EQ. 1) .AND. (M10 .EQ. 1)) DY(L,K) = DY(M,J)
-                    CSUM(L,K) = CSUM(L,K) + CSUM(M,J)
-               IF ((M3(I).GT.9).AND.(M3(I).LT.13))CSUM(K,K)=CSUM(L,K)+
-     1              CYCLSM(M,J)
-  120       CONTINUE
-            GO TO 40
-  130       I = I + 1
-            M = 0
-            IF (I .LE. IEND) GO TO 40
-            DO 260 L = 1, L5
-               IF ((M3(L) .LT. 10) .OR. (M3(L) .GT. 12)) GO TO 160
-               WRITE (6,10) IRR, ICASE
-               WRITE (6,140)
-  140          FORMAT ('THE FOLLOWING DATA IS THE SUMMATION OF THE' 
-     1         'SPECTRA FOR THE SEGMENTS SPECIFIED BY FLAG L = N2')
-               WRITE (6,150)
-  150          FORMAT (3X, 'FL', 3X, 'LL', 5X, 'MAX STRESS', 5X,
-     1         'MIN STRESS', 12X, 'CYCLES')
-               GO TO 190
-  160          WRITE (6,10) IRR, ICASE
-               WRITE (6,140)
-  170          WRITE (6,180)
-  180          FORMAT (3X, 'FL', 3X, 'LL', 5X, 'DELTA Y', 5X,
-     1         'CUMMULATIVE CYCLES', 10X, 'CYCLES')
-  190          IF (N(L) .LT. MAXN(L)) N(L) = MAXN(L)
+            END DO
+
+            DO WHILE (I .LE. IEND)
+               M = M + 1
+               M10 = 0
+               IF (N2(I).EQ.0 .OR. M.GT.IEND) GO TO 130
+               IF (N2(I) .NE. N2(M)) CYCLE
+               IF (I .EQ. M) GOTO 20
+               IF (I .GT. M) GOTO 130
+               K = 0
+               
+               IF (N(L) .LT. N(M)) THEN
+                  N(L) = N(M)
+                  M9 = 1
+                  IF (MAXN(L) .LT. N(M)) THEN
+                     MAXN(L) = N(M)
+                     M10 = 1
+                  END IF
+               ELSE 
+                  IF (N(L) .GT. N(M)) THEN
+                     N(L) = N(M)
+                     M9 = 2
+                  END IF
+               END IF
+               
+               JEND = N(L)
+               DO J = 1, JEND
+                  K = K + 1
+                  IF ((M9 .EQ. 1) .AND. (M10 .EQ. 1)) DY(L,K) = DY(M,J)
+                  CSUM(L,K) = CSUM(L,K) + CSUM(M,J)
+                  IF ((M3(I).GT.9).AND.(M3(I).LT.13))
+     1               CSUM(L,K) = CSUM(L,K) + CYCLSM(M,J)
+               END DO
+               CYCLE
+               
+  130          I = I + 1
+               M = 0
+            END DO
+
+            DO L = 1, L5
+               IF ((M3(L) .LT. 10) .OR. (M3(L) .GT. 12)) THEN
+                  WRITE (6,10) IRR, ICASE
+                  WRITE (6,140)
+                  WRITE (6,180)
+               ELSE
+                  WRITE (6,10) IRR, ICASE
+                  WRITE (6,140)
+                  WRITE (6,150)
+               END IF
+               IF (N(L) .LT. MAXN(L)) N(L) = MAXN(L)
                JEND = N(L)
                KJ = N(L) -1
-               DO 200 K = 1, KJ
-  200          CYCLSM(L,K) = CSUM(L,K) - CSUM(L,K+1)
-               DO 260 K = 1, JEND
-                  IF ((M3(L) .GT. 9) .AND. (M3(L) .LT. 13)) GO TO 220
-                  WRITE (6,210) L, K, DY(L,K), CSUM(L,K)
-  210             FORMAT (2X, I2, 3X, I2, 2X, F13.3, 3X, F16.4)
-                  IF (K .EQ. JEND) GO TO 260
-                  IF ((M3(L) .LT. 10) .OR. (M3(L) .GE. 13)) GO TO 240
-  220             WRITE (6,230) L, K, STSMXM(L,K), STSMNM(L,K), 
-     1                          CSUM(L,K)
-  230             FORMAT (1H0, 2X, I2, 3X, I2, 4X, F11.0, 4X, F11.0, 7X,
-     1                    F16.4)
-                  GO TO 260
-  240             WRITE (6,250) CYCLSM(L,K)
-  250             FORMAT (46X, F16.4)
-  260       CONTINUE
-            DO 270 L = 1, 40
-               DO 270 K = 1, 25
-  270       CSUM(L,K) = 0.0
-            RETURN
+               DO K = 1, KJ
+                  CYCLSM(L,K) = CSUM(L,K) - CSUM(L,K+1)
+               END DO
+               DO K = 1, JEND
+                  IF ((M3(L) .GT. 9) .AND. (M3(L) .LT. 13)) THEN
+                     WRITE(6,230)L,K,STSMXM(L,K),STSMNM(L,K),CSUM(L,K)
+                  ELSE
+                     WRITE (6,210) L, K, DY(L,K), CSUM(L,K)
+                     IF (K .EQ. JEND) CYCLE
+                     WRITE (6,250) CYCLSM(L,K)
+                  END IF
+               END DO
+            END DO
+
+            DO L = 1, 40
+            DO K = 1, 25
+               CSUM(L,K) = 0.0
+            END DO
+            END DO
+
+         RETURN
+   10    FORMAT ('REFERENCE RUN NO.', I6, 4X, 'CASE NO.', I6)
+  140    FORMAT ('THE FOLLOWING DATA IS THE SUMMATION OF THE' 
+     1   'SPECTRA FOR THE SEGMENTS SPECIFIED BY FLAG L = N2')
+  150    FORMAT (3X, 'FL', 3X, 'LL', 5X, 'MAX STRESS', 5X,
+     1   'MIN STRESS', 12X, 'CYCLES')
+  180    FORMAT (3X, 'FL', 3X, 'LL', 5X, 'DELTA Y', 5X,
+     1   'CUMMULATIVE CYCLES', 10X, 'CYCLES')
+  210    FORMAT (2X, I2, 3X, I2, 2X, F13.3, 3X, F16.4)
+  230    FORMAT (1H0, 2X, I2, 3X, I2, 4X, F11.0, 4X, F11.0, 7X,
+     1           F16.4)
+  250    FORMAT (46X, F16.4)
          END
 
 
@@ -1460,7 +1483,7 @@ C                    5 = Y ENTRIES NOT IN ASCENDING ORDER.
    60       NER = 2
             GO TO 80
    70       NER = 1
-   80       ICUT = 2
+   80       IOUT = 2
             GO TO 250
    90       IF (TABLE(NOETR +1) - ARGUMT) 100,110,140
   100       NER = 3
@@ -1478,7 +1501,7 @@ C     BEEN TESTED FOR AND HAVE PASSED.
             GO TO 260
   170       IF (TABLE(I + 1) - ARGUMT) 240,180,190
   180       NER = 1
-            ICUT = I + 1
+            IOUT = I + 1
             GO TO 250
   190       IF (NXDIR -1) 200,200,210
   200       NER = 1
