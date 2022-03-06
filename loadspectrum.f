@@ -190,6 +190,7 @@ C***     SPECTRUM LOADING RANDOM SEQUIENCE GENERATION PROGRAM
                      NSEG = I + 50
                      LEVEL = J
                      CALL TWOVIN(XARG, YARG, TKSIG, OUTPUT, NSEG,LEVEL)
+                     write(10,*)'1tw',XARG,YARG,TKSIG,OUTPUT,NSEG,LEVEL
                      AKSIG(I) = OUTPUT
                      AKSIG(I) = R1 * AKSIG(I)
                   END IF
@@ -332,7 +333,7 @@ C                 CALCULATE CYCLES FOR Y MAX AND Y MIN.
                      CASE (7:12)
                         XARG = (STSMXM(I,J) / SIGULT)
                         YARG = (STSMXM(I,J)+STSMNM(I,J)) /(2.0*SIGULT)
-                        I2= IA(I) - 12
+                        I2= IA(I) - 6
                      CASE (13:18)
                         XARG = (STSMXM(I,J)-STSMNM(I,J)) /(2.0*SIGULT)
                         YARG = (STSMXM(I,J)+STSMNM(I,J)) /(2.0*SIGULT)
@@ -354,7 +355,6 @@ C                 CALCULATE CYCLES FOR Y MAX AND Y MIN.
                YARGMN = TBLSN(2) - 0.001
                IF (XARG .LT. XARGMN) THEN
                   INTPER = 1
-               ELSE
                   GO TO 690
                END IF
                NSEG = 1
@@ -364,6 +364,7 @@ C                 CALCULATE CYCLES FOR Y MAX AND Y MIN.
                ! GIVEN THE INTERPOLATING VALUES XARG AND YARG, INTERPOLATE FOR A
                ! VALUE OF CYCLES TO FAILURE.
                CALL TWOVIN (XARG, YARG, TBLSN, OUTPUT, NSEG, LEVEL)
+               write(10,*)'2tw',XARG,YARG,TBLSN,OUTPUT,NSEG,LEVEL
                SELECT CASE (ICALL)
                   CASE (1)
                   ALIFE = AL1
@@ -1009,8 +1010,8 @@ C     TERMINATE WHEN ALL DATA HAS BEEN READ
                K = K + 1
                DY(L,K) = DY(I,J)
                CSUM(L,K) = CSUM(I,J)
-               IF ((M3(I) .GT. 9) .AND. (M3(I) .LT. 13)) CSUM(L,K) = 
-     1              CYCLSM(I,J)
+               IF ((M3(I) .GT. 9) .AND. (M3(I) .LT. 13)) 
+     1            CSUM(L,K) = CYCLSM(I,J)
             END DO
 
             DO WHILE (I .LE. IEND)
@@ -1077,11 +1078,7 @@ C     TERMINATE WHEN ALL DATA HAS BEEN READ
                END DO
             END DO
 
-            DO L = 1, 40
-            DO K = 1, 25
-               CSUM(L,K) = 0.0
-            END DO
-            END DO
+            CSUM = 0.0
 
          RETURN
    10    FORMAT ('REFERENCE RUN NO.', I6, 4X, 'CASE NO.', I6)
@@ -1097,226 +1094,213 @@ C     TERMINATE WHEN ALL DATA HAS BEEN READ
   250    FORMAT (46X, F16.4)
          END
 
-
          SUBROUTINE PRINT
-            COMMON X, Y
-            DIMENSION X(3958), Y(3958), SIG(40), SCLTRB(40), F(40)
-            DIMENSION YAW(40), CYBT(40), CYBT0(40)
-            DIMENSION M3(40), M5(40), ISTRES(40), IA(40), N1FLAG(40),
-     1      P(40), N6(40), N2(40), AM(40), DELY1(40), DELY11(40), 
-     2      ARNO1(40), ARNO2(40), ARNO3(40),	SGMAX1(40), SGMAX2(40), 
-     3      SGMAX3(40), AKSIG(40), SLOPE(40), VELOS(40), WT(40), P1(40),
-     4      P2(40), AK1(40), AK2(40), ABR(40), N(40), TBLM2(434), 
-     5      TBLI2(1542)
-            DIMENSION DELT1(25), DELT2(25), DELT3(25),DELT4(25), 
-     1      DELT5(25), DELT6(25), TAB1(25), TAB2(25), TAB3(25), 
-     2      TAB4(25), TAB5(25), TAB6(25),	TABL1(25), TABL2(25), 
-     3      TABL3(25), TABL4(25), TABL5(25), TABL6(25), TABL7(25),
-     4      TABL8(25), TABL9(25), T(40)
-            EQUIVALENCE (IEND, X(1)), (KEND, X(2)), (I4, X(3)),
-     1      (SIGULT, X(4)), (WAREA, X(5)), (ISTRES, X(6)), 
-     2      (DELT1, X(46)), (TAB1, X(71)), (TAB2, X(96)), 
-     3      (TAB3, X(121)),  (TAB4, X(146)), (TAB5, X(171)), 
-     4      (AC, X(196)), (IW1, X(197)), (IW2, X(198)), (IW3, X(199)),
-     5      (IW4, X(200)),	(IRR, X(201)), (ICASE, X(202)), 
-     6      (IW5,	X(203)), (TAB6,	X(206)), (DELT2, X(231)), 
-     7      (DELY1, X(256)), (DELY11, X(296)), (ARNO1, X(336)), 
-     8      (ARNO2, X(376)), (ARNO3, X(416)), (SGMAX1, X(456)), 
-     9      (SGMAX2, X(496)), (SGMAX3, X(536)), (T, X(576)), 
-     A      (AKSIG, X(616)), (SLOPE, X(656)), (VELOS, X(696)), 
-     B      (WT, X(736)), (P1, X(776)), (TBLM2, X(853))
-            EQUIVALENCE (P2, X(1473)), (AK1, X(1513)), (AK2, X(1553)),
-     l      (ABR, X(1593)), (IA,	X(1633)), (M3, X(1673)), 
-     2      (SIG, X(1713)), (AM,	X(1753)), (N, X(1793)), 
-     3      (NEND, X(1833)), (AL6, X(1850)), (AL5,  X(1851)), 
-     4      (AL4, X(1852)), (AL3, X(1853)), (AL2, X(1854)), 
-     5      (AL1, X(1855)), (TBLI2, X(1856)), (M5, X(3398)), 
-     6      (N1FLAG, X(3438)), (F, X(3478)), (N6, X(3518)), 
-     7      (N2, X(3558)),	(P, X(3598)), (SCLTRB, X(3638)), 
-     8      (TABL1, X(3678)), (TABL2, X(3703)), (TABL3, X(3728)), 
-     9      (TABL4, X(3753)), (TABL5, X(3778)), (TABL6, X(3803)), 
-     A      (TABL7,	X(1287)), (TABL8, X(1312)), (TABL9, X(1337)),	
-     B      (DELT3,	X(1362)), (DELT4, X(1387))
-            EQUIVALENCE (DELT5, X(1412)), (DELT6, X(1437)),
-     1                  (L1, X(1462))
-            EQUIVALENCE (CBART, X(3837)), (AST, X(3838)), 
-     1                  (YAW, X(3839)), (CYBT, X(3879)), 
-     2                  (CYBT0, X(3919))
-   10       FORMAT ('REFERNCE RUN NO. ', I6, 4X, 'CASE NO. ', I6)
-   20       FORMAT (4X, 'IEND', 1X,'KEND', 1X, 'I4', 4X, 'S-ULT.', 3X,
-     1      '---S---',3X,'C-BAR-',3X,'---NEND---',2X,'L1', 2X, 'IW1',
-     2      2X, 'IW2', 2X, 'IW3', 2X, 'IW4', 2X, 'IW5')
-   25       FORMAT (4X, 'IEND', 1X, 'KEND', 1X, 'I4', 4X, 'S-ULT.', 3X, 
-     1               '---S---', 3X, 'C-BAR-', 3X, '---NEND---', 3X, 'L1',
-     2               3X, 'IW1', 2X, 'IW2', 2X, 'IW3', 2X, 'IW4', 2X,
-     3               'IW5', 2X, 'V.T.CHORD', 'V.T.AREA.') 
-   30       FORMAT (5X, I2, 3X, I2, 2X, I2, F12.3, F8.2, 2X, F7.2,
-     1              3X, F10.0, 3X, I1, 3X, I1, 4X, I1, 4X, I1, 4X, 
-     2              I1, 4X, I1)
-   35       FORMAT(5X, I2, 3X, I2, 2X, I2, F12.3, F8.2, 2X, F7.2,
-     l             3X, F10.0, 3X, I1, 3X, I1, 4X, I1, 4X, I1, 4X, I1, 
-     2             4X, I1, 3X, F8.2, 2X, F8.2)
-   40       FORMAT(2X, 'SEG.', 1X, 'M3', 2X, 'M5', 2X, 'ISTRES', 2X, 
-     1      'IA', 2X, 'IFLAG', 1X, 'H------P------', 2X, 'N6', 2X, 'N2',
-     2       2X, '-----AM-----', 3X, '--------F--------', 10X, 
-     3      'DELTA Y1', 10X, 'DELTA Y11')
-   50       FORMAT (3X, I2, 2X, I2, 2X, I2, 4X, I2, 4X, I2, 4X, I1, 4X,
-     1              F13.0, 2X, I2, 2X, I2, 2X, F13.0, 3X, F17.4, 3X, 
-     2              F17.4, 3X, F17.4)
-   60       FORMAT ('SEG.', 1X, 'H---N SUB 01---', 2X '---N SUB 02---',
-     1      2X, '---N SUB 03---', 2X, '--SIG DY1--', 2X, '--SIG DY2--', 
-     2      2X, '--SIG DY3--')
-   70       FORMAT (1X, I2, 2X, F14.4, 2X, F14.4, 2X, F14.4, 2X, F11.4,
-     1              2X, F11.4, 2X, F11.4)
-   80       FORMAT (2X, 'SEG.', 3X, 'KSIGMA', 3X, 'SLOPE', 5X, 'VE', 4X,
-     1      '-----W----', 6X, 'P1', 10X, 'P2', 9X, 'B1', 7X, 'B2', 10X,
-     2      'A-BAR', 5X, '-------T------', 4X, 'N')
-   90       FORMAT (3X, I2, 3X, F8.5, 1X, F6.2, 2X, F7.2, 2X, F10.0, 2X,
-     1              F10.6, 2X, F10.6, 2X, F7.3, 2X, F7.3, F16.6, 2X, 
-     2              F14.3, 3X, I2)
-  100       FORMAT (3X, 'SEG.', 4X, 'AIR DENSITY RATIO', 5X,
-     1      'SCALE OF TURBULENCE')
-  105       FORMAT (3X, 'SEG.', 4X, 'AIR DENSITY RATIO', 5X,
-     1      'SCALE OF TURBULENCE', 11X, 'SFC - T*', 'SFC - TO', 5X,
-     2      '    IYAW   ')
-  110       FORMAT (4X, I2, 9X, F9.5, 14X, F10.3)
-  115       FORMAT (4X, I2, 9X,F 9.5,14X,F10.3,14X,F8.4,6X,F8.4,8X,
-     1              F16.0)
-  120       FORMAT (4X, 'LL', 4X, 'STRESS TBL1', 2X, 'STRESS TBL2', 2X,
-     1      'STRESS TBL3', 2X, 'STRESS TBL4', 2X, 'STRESS TBL5', 2X,
-     2      'STRESS TBL6', 2X, 'STRESS TBL7', 2X, 'STRESS TBL8')
-  130       FORMAT (1H0)
-  140       FORMAT (4X, I2, 3X, F13.2, 1X, F13.2, F13.2, F13.2 F13.2,
-     1              F13.2, F13.2, F13.2)
-  150       FORMAT (4X, I2, 3X, F13.2, 1X, F13.2, F13.2, F13.2, F13.2,
-     1              F13.2)
-  160       FORMAT (4X, 'LL', 4X, 'DELTA Y--TABLE 1', 2X,
-     1      'DELTA Y--TABLE 2', 2X, 'DELTA Y--TABLE 3', 2X,
-     2      'DELTA Y--TABLE 4', 2X, 'DELTA Y--TABLE 5', 2X,
-     3      'DELTA Y--TABLE 6')
-  170       FORMAT (4X, I2, F18.3, F18.3, F18.3, F18.3, F18.3, F18.3)
-  180       FORMAT (4X, 'LL', 4X, 'CUM CYCLES TBL 1', 2X
-     1      'CUM CYCLES TBL 2', 2X, 'CUM CYCLES TBL 3', 2X
-     2      'CUM CYCLES TBL 4', 2X, 'CUM CYCLES TBL 5', 2X,
-     3      'CUM CYCLES TBL 6')
-  190       FORMAT (4X I2, F19.3, F18.3, F18.3, F18.3, F18.3, F18.3)
-  200       FORMAT (4X, 'LL', 4X, 'STRESS TBL 9', 2X, 'STRESS TBL 10',
-     1      1X, 'STRESS TBL 11', 1X, 'STRESS TBL 12', 1X, 
-     2      'STRESS TBL 13', 1X, 'STRESS TBL 14', 1X, 'STRESS TBL 15', 
-     3      1X, 'STRESS TBL 16')
-  210       FORMAT (4X, 'LL', 4X, 'MAX STRESS(1)', 2X, 'MIN STRESS(1)',
-     1      6X, 'CYCLES(1)', 5X, 'MAX STRESS(2)', 2X, 'MIN STRESS(2)', 
-     2      6X, 'CYCLES(2)')
-  220       FORMAT (4X, I2, F17.0, F15.0, F18.0, F15.0, F15.0, F18.0)
-  230       FORMAT (4X, 'LL', 4X, 'MAX STRESS(3)', 2X, 
-     1      'MIN STRESS(3)', 6X,'CYCLES(3)')
-  240       FORMAT (4X, I2, F17.0, F15.0, F18.0)
-  250       FORMAT (2X, 'S-N TABLE = ',I2, 2X, 'IA AND/OR I4 = ',I2)
-  260       FORMAT (4X, 'NO. OF Y ENTRIES = ',F4.0, 4X,
-     1       'NO. OF X ENTRIES = ',F4.0, 2X, 'MAX CYCLES TO FAILURE = ',
-     2        F12.0)
-  270       FORMAT (7X, 'Y', 12X, 'X', 10X, 'Y1,X', 9X, 'Y2,X', 9X,
-     1      'Y3,X', 9X, 'Y4,X', 9X, 'Y5,X', 9X, 'Y6,X', 9X, 'Y7,X')
-  280       FORMAT (1X,F12.3, F14.4, F13.0, F13.0, F13.0,
-     1      F13.0, F13.0, F13.0, F13.0)
-  290       FORMAT (8X, 'Y8,X', 10X, 'Y9,X', 9X, 'Y10,0', 9X, 'Y11,X',
-     1      9X, 'Y12,X', 9X, 'Y13,X', 9X, 'Y14,X', 9X, 'Y15,X')
-  300       FORMAT (4X, F12.0, 2X, F12.0, 2X, F12.0, 2X, F12.0, 2X, 
-     1      F12.0, 2X, F12.0, 2X, F12.0, 2X, F12.0)
-  310       FORMAT ('THE FOLLOWING DATA IS INPUT DATA')
-  320       FORMAT ('STRESS TABLES, S = X = F(Y). LL 1 = NO. OF Y '
-     1      'ENTRIES LL 2 - 16 = Y VALUES, LL 17-31 = X VALUES')
-         write(9,*) 'in prn1',X(201),int(X(201)),IRR
-            WRITE (6,310)
-            DO 323 I = 1, IEND
-               IF ((M3(I) .NE. 14) .AND. (M3(I) .NE. 15)) GO TO 325
-  323       CONTINUE
+         COMMON X, Y
+         DIMENSION X(3958), Y(3958), SIG(40), SCLTRB(40), F(40)
+         DIMENSION YAW(40), CYBT(40), CYBT0(40)
+         DIMENSION M3(40), M5(40), ISTRES(40), IA(40), N1FLAG(40),
+     1   P(40), N6(40), N2(40), AM(40), DELY1(40), DELY11(40), 
+     2   ARNO1(40), ARNO2(40), ARNO3(40),	SGMAX1(40), SGMAX2(40), 
+     3   SGMAX3(40), AKSIG(40), SLOPE(40), VELOS(40), WT(40), P1(40),
+     4   P2(40), AK1(40), AK2(40), ABR(40), N(40), TBLM2(434), 
+     5   TBLI2(1542)
+         DIMENSION DELT1(25), DELT2(25), DELT3(25),DELT4(25), 
+     1   DELT5(25), DELT6(25), TAB1(25), TAB2(25), TAB3(25), 
+     2   TAB4(25), TAB5(25), TAB6(25),	TABL1(25), TABL2(25), 
+     3   TABL3(25), TABL4(25), TABL5(25), TABL6(25), TABL7(25),
+     4   TABL8(25), TABL9(25), T(40)
+         EQUIVALENCE (IEND, X(1)), (KEND, X(2)), (I4, X(3)),
+     1   (SIGULT, X(4)), (WAREA, X(5)), (ISTRES, X(6)), 
+     2   (DELT1, X(46)), (TAB1, X(71)), (TAB2, X(96)), 
+     3   (TAB3, X(121)),  (TAB4, X(146)), (TAB5, X(171)), 
+     4   (AC, X(196)), (IW1, X(197)), (IW2, X(198)), (IW3, X(199)),
+     5   (IW4, X(200)),	(IRR, X(201)), (ICASE, X(202)), 
+     6   (IW5,	X(203)), (TAB6,	X(206)), (DELT2, X(231)), 
+     7   (DELY1, X(256)), (DELY11, X(296)), (ARNO1, X(336)), 
+     8   (ARNO2, X(376)), (ARNO3, X(416)), (SGMAX1, X(456)), 
+     9   (SGMAX2, X(496)), (SGMAX3, X(536)), (T, X(576)), 
+     A   (AKSIG, X(616)), (SLOPE, X(656)), (VELOS, X(696)), 
+     B   (WT, X(736)), (P1, X(776)), (TBLM2, X(853))
+         EQUIVALENCE (P2, X(1473)), (AK1, X(1513)), (AK2, X(1553)),
+     l   (ABR, X(1593)), (IA,	X(1633)), (M3, X(1673)), 
+     2   (SIG, X(1713)), (AM,	X(1753)), (N, X(1793)), 
+     3   (NEND, X(1833)), (AL6, X(1850)), (AL5,  X(1851)), 
+     4   (AL4, X(1852)), (AL3, X(1853)), (AL2, X(1854)), 
+     5   (AL1, X(1855)), (TBLI2, X(1856)), (M5, X(3398)), 
+     6   (N1FLAG, X(3438)), (F, X(3478)), (N6, X(3518)), 
+     7   (N2, X(3558)),	(P, X(3598)), (SCLTRB, X(3638)), 
+     8   (TABL1, X(3678)), (TABL2, X(3703)), (TABL3, X(3728)), 
+     9   (TABL4, X(3753)), (TABL5, X(3778)), (TABL6, X(3803)), 
+     A   (TABL7,	X(1287)), (TABL8, X(1312)), (TABL9, X(1337)),	
+     B   (DELT3,	X(1362)), (DELT4, X(1387))
+         EQUIVALENCE (DELT5, X(1412)), (DELT6, X(1437)),
+     1               (L1, X(1462))
+         EQUIVALENCE (CBART, X(3837)), (AST, X(3838)), 
+     1               (YAW, X(3839)), (CYBT, X(3879)), 
+     2               (CYBT0, X(3919))
+   10    FORMAT ('REFERNCE RUN NO. ', I6, 4X, 'CASE NO. ', I6)
+   20    FORMAT (4X, 'IEND', 1X,'KEND', 1X, 'I4', 4X, 'S-ULT.', 3X,
+     1   '---S---',3X,'C-BAR-',3X,'---NEND---',2X,'L1', 2X, 'IW1',
+     2   2X, 'IW2', 2X, 'IW3', 2X, 'IW4', 2X, 'IW5')
+   25    FORMAT (4X, 'IEND', 1X, 'KEND', 1X, 'I4', 4X, 'S-ULT.', 3X, 
+     1            '---S---', 3X, 'C-BAR-', 3X, '---NEND---', 3X, 'L1',
+     2            3X, 'IW1', 2X, 'IW2', 2X, 'IW3', 2X, 'IW4', 2X,
+     3            'IW5', 2X, 'V.T.CHORD', 'V.T.AREA.') 
+   30    FORMAT (5X, I2, 3X, I2, 2X, I2, F12.3, F8.2, 2X, F7.2,
+     1           3X, F10.0, 3X, I1, 3X, I1, 4X, I1, 4X, I1, 4X, 
+     2           I1, 4X, I1)
+   35    FORMAT(5X, I2, 3X, I2, 2X, I2, F12.3, F8.2, 2X, F7.2,
+     l          3X, F10.0, 3X, I1, 3X, I1, 4X, I1, 4X, I1, 4X, I1, 
+     2          4X, I1, 3X, F8.2, 2X, F8.2)
+   40    FORMAT(2X, 'SEG.', 1X, 'M3', 2X, 'M5', 2X, 'ISTRES', 2X, 
+     1   'IA', 2X, 'IFLAG', 1X, 'H------P------', 2X, 'N6', 2X, 'N2',
+     2    2X, '-----AM-----', 3X, '--------F--------', 10X, 
+     3   'DELTA Y1', 10X, 'DELTA Y11')
+   50    FORMAT (3X, I2, 2X, I2, 2X, I2, 4X, I2, 4X, I2, 4X, I1, 4X,
+     1           F13.0, 2X, I2, 2X, I2, 2X, F13.0, 3X, F17.4, 3X, 
+     2           F17.4, 3X, F17.4)
+   60    FORMAT ('SEG.', 1X, 'H---N SUB 01---', 2X '---N SUB 02---',
+     1   2X, '---N SUB 03---', 2X, '--SIG DY1--', 2X, '--SIG DY2--', 
+     2   2X, '--SIG DY3--')
+   70    FORMAT (1X, I2, 2X, F14.4, 2X, F14.4, 2X, F14.4, 2X, F11.4,
+     1           2X, F11.4, 2X, F11.4)
+   80    FORMAT (2X, 'SEG.', 3X, 'KSIGMA', 3X, 'SLOPE', 5X, 'VE', 4X,
+     1   '-----W----', 6X, 'P1', 10X, 'P2', 9X, 'B1', 7X, 'B2', 10X,
+     2   'A-BAR', 5X, '-------T------', 4X, 'N')
+   90    FORMAT (3X, I2, 3X, F8.5, 1X, F6.2, 2X, F7.2, 2X, F10.0, 2X,
+     1           F10.6, 2X, F10.6, 2X, F7.3, 2X, F7.3, F16.6, 2X, 
+     2           F14.3, 3X, I2)
+  100    FORMAT (3X, 'SEG.', 4X, 'AIR DENSITY RATIO', 5X,
+     1   'SCALE OF TURBULENCE')
+  105    FORMAT (3X, 'SEG.', 4X, 'AIR DENSITY RATIO', 5X,
+     1   'SCALE OF TURBULENCE', 11X, 'SFC - T*', 'SFC - TO', 5X,
+     2   '    IYAW   ')
+  110    FORMAT (4X, I2, 9X, F9.5, 14X, F10.3)
+  115    FORMAT (4X, I2, 9X,F 9.5,14X,F10.3,14X,F8.4,6X,F8.4,8X,
+     1           F16.0)
+  120    FORMAT (4X, 'LL', 4X, 'STRESS TBL1', 2X, 'STRESS TBL2', 2X,
+     1   'STRESS TBL3', 2X, 'STRESS TBL4', 2X, 'STRESS TBL5', 2X,
+     2   'STRESS TBL6', 2X, 'STRESS TBL7', 2X, 'STRESS TBL8')
+  130    FORMAT (1H0)
+  140    FORMAT (4X, I2, 3X, F13.2, 1X, F13.2, F13.2, F13.2 F13.2,
+     1           F13.2, F13.2, F13.2)
+  150    FORMAT (4X, I2, 3X, F13.2, 1X, F13.2, F13.2, F13.2, F13.2,
+     1           F13.2)
+  160    FORMAT (4X, 'LL', 4X, 'DELTA Y--TABLE 1', 2X,
+     1   'DELTA Y--TABLE 2', 2X, 'DELTA Y--TABLE 3', 2X,
+     2   'DELTA Y--TABLE 4', 2X, 'DELTA Y--TABLE 5', 2X,
+     3   'DELTA Y--TABLE 6')
+  170    FORMAT (4X, I2, F18.3, F18.3, F18.3, F18.3, F18.3, F18.3)
+  180    FORMAT (4X, 'LL', 4X, 'CUM CYCLES TBL 1', 2X
+     1   'CUM CYCLES TBL 2', 2X, 'CUM CYCLES TBL 3', 2X
+     2   'CUM CYCLES TBL 4', 2X, 'CUM CYCLES TBL 5', 2X,
+     3   'CUM CYCLES TBL 6')
+  190    FORMAT (4X I2, F19.3, F18.3, F18.3, F18.3, F18.3, F18.3)
+  200    FORMAT (4X, 'LL', 4X, 'STRESS TBL 9', 2X, 'STRESS TBL 10',
+     1   1X, 'STRESS TBL 11', 1X, 'STRESS TBL 12', 1X, 
+     2   'STRESS TBL 13', 1X, 'STRESS TBL 14', 1X, 'STRESS TBL 15', 
+     3   1X, 'STRESS TBL 16')
+  210    FORMAT (4X, 'LL', 4X, 'MAX STRESS(1)', 2X, 'MIN STRESS(1)',
+     1   6X, 'CYCLES(1)', 5X, 'MAX STRESS(2)', 2X, 'MIN STRESS(2)', 
+     2   6X, 'CYCLES(2)')
+  220    FORMAT (4X, I2, F17.0, F15.0, F18.0, F15.0, F15.0, F18.0)
+  230    FORMAT (4X, 'LL', 4X, 'MAX STRESS(3)', 2X, 
+     1   'MIN STRESS(3)', 6X,'CYCLES(3)')
+  240    FORMAT (4X, I2, F17.0, F15.0, F18.0)
+  250    FORMAT (2X, 'S-N TABLE = ',I2, 2X, 'IA AND/OR I4 = ',I2)
+  260    FORMAT (4X, 'NO. OF Y ENTRIES = ',F4.0, 4X,
+     1    'NO. OF X ENTRIES = ',F4.0, 2X, 'MAX CYCLES TO FAILURE = ',
+     2     F12.0)
+  270    FORMAT (7X, 'Y', 12X, 'X', 10X, 'Y1,X', 9X, 'Y2,X', 9X,
+     1   'Y3,X', 9X, 'Y4,X', 9X, 'Y5,X', 9X, 'Y6,X', 9X, 'Y7,X')
+  280    FORMAT (1X,F12.3, F14.4, F13.0, F13.0, F13.0,
+     1   F13.0, F13.0, F13.0, F13.0)
+  290    FORMAT (8X, 'Y8,X', 10X, 'Y9,X', 9X, 'Y10,0', 9X, 'Y11,X',
+     1   9X, 'Y12,X', 9X, 'Y13,X', 9X, 'Y14,X', 9X, 'Y15,X')
+  300    FORMAT (4X, F12.0, 2X, F12.0, 2X, F12.0, 2X, F12.0, 2X, 
+     1   F12.0, 2X, F12.0, 2X, F12.0, 2X, F12.0)
+  310    FORMAT ('THE FOLLOWING DATA IS INPUT DATA')
+  320    FORMAT ('STRESS TABLES, S = X = F(Y). LL 1 = NO. OF Y '
+     1   'ENTRIES LL 2 - 16 = Y VALUES, LL 17-31 = X VALUES')
+
+         WRITE (6,310)
+
+         IF (ALL(M3(1:IEND).GE.14) .AND. ALL(M3(1:IEND).LE.15)) THEN
             WRITE (6,25)
-            WRITE (6,35) IEND, KEND, I4, SIGULT, WAREA, AC, FLOAT(NEND), 
+            WRITE (6,35) IEND,KEND,I4,SIGULT, WAREA, AC,FLOAT(NEND), 
      1      L1, IW1, IW2, IW3, IW4, IW5, CBART, AST
-            GO TO 327
-  325       WRITE (6,20)
+         ELSE
+            WRITE (6,20)
             WRITE (6,30) IEND, KEND, I4,SIGULT,WAREA,AC,float(NEND),
      1                   L1, IW1, IW2, IW3, IW4, IW5
-  327       WRITE (6,40)
-            WRITE (6,50) (I, M3(I), M5(I), ISTRES(I), IA(I), N1FLAG(I), 
-     1                    P(I), N6(I), N2(I), AM(I), F(I), DELY1(I), 
-     2                    DELY11(I), I = 1, IEND)
-            WRITE (6,10) IRR, ICASE
-            WRITE (6,310)
-            WRITE (6,60)
-            WRITE (6,70) (I, ARNO1(I), ARNO2(I), ARNO3(I), SGMAX1(I),
-     1                    SGMAX2(I), SGMAX3(I), I = 1, IEND)
-            WRITE (6,10) IRR, ICASE
-            WRITE (6,310)
-            WRITE (6,80)
-            WRITE (6,90) (I, AKSIG(I), SLOPE(I), VELOS(I), WT(I), P1(I), 
-     1                   P2(I), AK1(I), AK2(I), ABR(I), T(I), N(I), 
-     2                   I = 1, IEND)
-            DO 330 I = 1, IEND
-               IF ((M3(I) .EQ. 14) .OR. (M3(I) .EQ. 15)) GO TO 340
-               IF ((M3(I) .EQ. 13)) GO TO 340
-  330       CONTINUE
-            GO TO 350
-  340       WRITE (6,10) IRR, ICASE
-            WRITE (6,310)
-         write(9,*) 'in prn2',X(201),int(X(201)),IRR
-         !close(9)
+         END IF
 
-            DO 343 I = 1, IEND
-               IF ((M3(I) .NE. 14) .AND. (M3(I) .NE. 15)) GO TO 345
-  343       CONTINUE
-            WRITE (6,105)
-            WRITE (6,115) (I, SIG(I), SCLTRB(I), CYBT(I), CYBT0(I), 
-     1      YAW(I), I = 1, IEND)
-            GO TO 350
-  345       WRITE (6,100)
-            WRITE (6,110) (I, SIG(I), SCLTRB(I), I = 1, IEND)
-  350       DO 360, I = 1, IEND
-               IF ((M5(I) .GT. 0) .AND. (M5(I) .LT. 7)) GO TO 370
-  360       CONTINUE
-            GO TO 380
-  370       WRITE (6,10) IRR, ICASE
+         WRITE (6,40)
+         WRITE (6,50) (I, M3(I), M5(I), ISTRES(I), IA(I), N1FLAG(I), 
+     1                 P(I), N6(I), N2(I), AM(I), F(I), DELY1(I), 
+     2                 DELY11(I), I = 1, IEND)
+         WRITE (6,10) IRR, ICASE
+         WRITE (6,310)
+         WRITE (6,60)
+         WRITE (6,70) (I, ARNO1(I), ARNO2(I), ARNO3(I), SGMAX1(I),
+     1                 SGMAX2(I), SGMAX3(I), I = 1, IEND)
+         WRITE (6,10) IRR, ICASE
+         WRITE (6,310)
+         WRITE (6,80)
+         WRITE (6,90) (I, AKSIG(I), SLOPE(I), VELOS(I), WT(I), P1(I), 
+     1                P2(I), AK1(I), AK2(I), ABR(I), T(I), N(I), 
+     2                I = 1, IEND)
+
+         IF (ANY(M3(1:IEND).GE.13 .AND. M3(1:IEND).LE.15)) THEN
+            WRITE (6,10) IRR, ICASE
+            WRITE (6,310)
+            IF(ALL(M3(1:IEND).GE.14).AND.ALL(M3(1:IEND).LE.15)) THEN
+               WRITE (6,105)
+               WRITE (6,115) (I, SIG(I), SCLTRB(I),CYBT(I),CYBT0(I),
+     1         YAW(I), I = 1, IEND)
+            ELSE
+               WRITE (6,100)
+               WRITE (6,110) (I, SIG(I), SCLTRB(I), I = 1, IEND)
+            END IF
+         END IF
+
+         IF (ANY(M5(1:IEND).GT.0 .AND. M5(1:IEND).LT.7)) THEN
+            WRITE (6,10) IRR, ICASE
             WRITE (6,310)
             WRITE (6,130)
             WRITE (6,160)
-            WRITE (6,170) (J, DELT1(J), DELT2(J), DELT3(J), DELT4(J),
+            WRITE (6,170)(J, DELT1(J), DELT2(J), DELT3(J), DELT4(J),
      1      DELT5(J), DELT6(J), J = 1, 25)
-  380       DO 390 I = 1, IEND
-               IF ((M3(I) .GT. 0) .AND. (M3(I) .LT. 7)) GO TO 400
-  390       CONTINUE
-            GO TO 410
-  400       WRITE (6,10) IRR, ICASE
+         END IF
+
+         IF (ANY(M3(1:IEND).GT.0 .AND. M3(1:IEND).LT.7)) THEN
+            WRITE (6,10) IRR, ICASE
             WRITE (6,310)
             WRITE (6,130)
             WRITE (6,180)
             WRITE (6,190) (J,TAB1(J),TAB2(J),TAB3(J),TAB4(J),TAB5(J),
      1      TAB6(J), J = 1, 25)
-  410       DO 420 I = 1, IEND
-               IF ((M3(I) .GT. 9) .AND. (M3(I) .LT. 12)) GO TO 430
-  420       CONTINUE
-            GO TO 440
-  430       WRITE (6,10) IRR, ICASE
+         END IF
+
+         IF (ANY(M3(1:IEND).GT.9 .AND. M3(1:IEND).LT.12)) THEN
+            WRITE (6,10) IRR, ICASE
             WRITE (6,310)
             WRITE (6,130)
             WRITE (6,210)
-            WRITE (6,220) (J, TABL1(J), TABL2(J), TABL3(J), TABL4(J), 
+            WRITE (6,220)(J, TABL1(J), TABL2(J), TABL3(J), TABL4(J),
      1      TABL5(J), TABL6(J), J = 1, 25)
-  440       DO 450 I = 1, IEND
-            IF (M3(I) .EQ. 12) GO TO 460
-  450       CONTINUE
-            GO TO 470
-  460       WRITE (6,10) IRR, ICASE
+         END IF
+
+         IF (ANY(M3(1:IEND).EQ.12)) THEN
+            WRITE (6,10) IRR, ICASE
             WRITE (6,310)
             WRITE (6,130)
             WRITE (6,230)
-            WRITE (6,240) (J, TABL7(J), TABL8(J), TABL9(J), J = 1, 25)
-  470       DO 480 I = 1, IEND
-               IF ((ISTRES(I) .GT. 0) .AND. (ISTRES(I) .LT. 9))
-     1            GO TO 490
-  480       CONTINUE
-            GO TO 500
-  490       WRITE (6,10) IRR, ICASE
+            WRITE (6,240) (J, TABL7(J), TABL8(J), TABL9(J), J=1,25)
+         END IF
+
+         IF(ANY(ISTRES(1:IEND).GT.0 .AND. ISTRES(1:IEND).LT.9))THEN
+            WRITE (6,10) IRR, ICASE
             WRITE (6,310)
             WRITE (6,130)
             WRITE (6,320)
@@ -1324,12 +1308,10 @@ C     TERMINATE WHEN ALL DATA HAS BEEN READ
             WRITE (6,140) (J, TBLM2(J), TBLM2(J+31), TBLM2(J+62), 
      1                     TBLM2(J+93), TBLM2(J+124), TBLM2(J+155), 
      2                     TBLM2(J+186), TBLM2(J+217), J = 1, 31)
-  500       DO 510 I = 1, IEND
-               IF((ISTRES(I) .GT. 8) .AND. (ISTRES(I) .LT. 15)) 
-     1           GO TO 520
-  510       CONTINUE
-            GO TO 530
-  520       WRITE (6,10) IRR, ICASE
+         END IF
+
+         IF(ANY(ISTRES(1:IEND).GT.8 .AND. ISTRES(1:IEND).LT.15))THEN
+            WRITE (6,10) IRR, ICASE
             WRITE (6,310)
             WRITE (6,130)
             WRITE (6,320)
@@ -1337,127 +1319,138 @@ C     TERMINATE WHEN ALL DATA HAS BEEN READ
             WRITE (6,140) (J, TBLM2(J), TBLM2(J+248), TBLM2(J+279), 
      1                     TBLM2(J+310), TBLM2(J+341), TBLM2(J+372), 
      2                     TBLM2(J+403), J = 1, 31)
-  530       A5 = 0.0
-            B5 = 0.0
-            C5 = 0.0
-            D5 = 0.0
-            E5 = 0.0
-            F5 = 0.0
-            G5 = 0.0
-  540       DO 620 I = 1, IEND
-               IF (IA(I) .LT. 7) I2 = IA(I)
-               IF ((IA(I) .GT.6) .AND. (IA(I) .LT. 13)) I2 = (IA(I) - 6)
-               IF ((IA(I) .GT. 12) .AND. (IA(I) .LT. 19)) I2 = 
-     1            (IA(I) - 12)
-               IF (IA(I) .GT. 18) I2 = (IA(I) -18)
+         END IF
+
+         A5 = 0.0
+         B5 = 0.0
+         C5 = 0.0
+         D5 = 0.0
+         E5 = 0.0
+         F5 = 0.0
+         G5 = 0.0
+         DO WHILE(.TRUE.)
+            DO I = 1, IEND
+               IF ( IA(I).LT.7) I2 = IA(I)
+               IF ((IA(I).GT.6) .AND. (IA(I).LT.13)) I2 = IA(I)-6
+               IF ((IA(I).GT.12) .AND. (IA(I).LT.19)) I2 = IA(I)-12
+               IF ( IA(I).GT.18) I2 = IA(I) -18
                ICALL = I2
-               GO TO (550, 560, 570, 580, 590, 600), ICALL
-  550          IF (A5 .EQ. 1.0) GO TO 610
-               WRITE (6,10)  IRR, ICASE
-               WRITE (6,310)
-               WRITE (6,250) ICALL, IA(I)
-               WRITE (6,260) TBLI2(1), TBLI2(17), AL1
-               WRITE (6,270)
-               WRITE (6,280) (TBLI2(J), TBLI2(J+16), TBLI2(J+31),
-     1         TBLI2(J+46), TBLI2(J+61), TBLI2(J+76), TBLI2(J+91),
-     2         TBLI2(J+106), TBLI2(J+121), J = 2, 16)
-               WRITE (6,290)
-               WRITE (6,300)  (TBLI2(J+136), TBLI2(J+151), TBLI2(J+166),
-     1         TBLI2(J+181), TBLI2(J+196), TBLI2(J+211), TBLI2(J+226),
-     2         TBLI2(J+241), J = 2, 16)
-               A5 = 1.0
-               GO TO 610
-  560          IF (B5 .EQ. 1.0) GO TO 610
-               WRITE (6,10) IRR, ICASE
-               WRITE (6,310)
-               WRITE (6,250) ICALL, IA(I)
-               WRITE (6,260) TBLI2(258), TBLI2(274), AL2
-               WRITE (6,270)
-               WRITE (6,280) (TBLI2(J), TBLI2(J+16), TBLI2(J+31),
-     1         TBLI2(J+46), TBLI2(J+61), TBLI2(J+76), TBLI2(J+91),
-     2         TBLI2(J+106), TBLI2(J+121), J = 259, 273)
-               WRITE (6,290)
-               WRITE (6,300)  (TBLI2(J+136), TBLI2(J+151), TBLI2(J+166),
-     1         TBLI2(J+181), TBLI2(J+196), TBLI2(J+211), TBLI2(J+226),
-     2         TBLI2(J+241), J = 259, 273)
-               B5 = 1.0
-               GO TO 610
-  570          IF (C5 .EQ. 1.0) GO TO 610
-               WRITE (6,10) IRR, ICASE
-               WRITE (6,310)
-               WRITE (6,250) ICALL, IA(I)
-               WRITE (6,260) TBLI2(515), TBLI2(531), AL3
-               WRITE (6,270)
-               WRITE (6,280) (TBLI2(J), TBLI2(J+16), TBLI2(J+31),
-     1         TBLI2(J+46), TBLI2(J+61), TBLI2(J+76), TBLI2(J+91),
-     2         TBLI2(J+106), TBLI2(J+121), J = 516, 530)
-               WRITE (6,290)
-               WRITE (6,300)  (TBLI2(J+136), TBLI2(J+151), TBLI2(J+166),
-     1         TBLI2(J+181), TBLI2(J+196), TBLI2(J+211), TBLI2(J+226),
-     2         TBLI2(J+241), J = 516, 530)
-               C5 = 1.0
-               GO TO 610
-  580          IF (D5 .EQ. 1.0) GO TO 610
-               WRITE (6,10) IRR, ICASE
-               WRITE (6,310)
-               WRITE (6,250) ICALL, IA(I)
-               WRITE (6,260) TBLI2(772), TBLI2(788), AL4
-               WRITE (6,270)
-               WRITE (6,280) (TBLI2(J), TBLI2(J+16), TBLI2(J+31),
-     1         TBLI2(J+46), TBLI2(J+61), TBLI2(J+76), TBLI2(J+91),
-     2         TBLI2(J+106), TBLI2(J+121), J = 773, 787)
-               WRITE (6,290)
-               WRITE (6,300)  (TBLI2(J+136), TBLI2(J+151), TBLI2(J+166),
-     1         TBLI2(J+181), TBLI2(J+196), TBLI2(J+211), TBLI2(J+226),
-     2         TBLI2(J+241), J = 773, 787)
-               D5 = 1.0
-               GO TO 610
-  590          IF (E5 .EQ. 1.0) GO TO 610
-               WRITE (6,10) IRR, ICASE
-               WRITE (6,310)
-               WRITE (6,250) ICALL, IA(I)
-               WRITE (6,260) TBLI2(1029), TBLI2(1045), AL6
-               WRITE (6,270)
-               WRITE (6,280) (TBLI2(J), TBLI2(J+16), TBLI2(J+31),
-     1         TBLI2(J+46), TBLI2(J+61), TBLI2(J+76), TBLI2(J+91),
-     2         TBLI2(J+106), TBLI2(J+121), J = 1030, 1044)
-               WRITE (6,290)
-               WRITE (6,300)  (TBLI2(J+136), TBLI2(J+151), TBLI2(J+166),
-     1         TBLI2(J+181), TBLI2(J+196), TBLI2(J+211), TBLI2(J+226),
-     2         TBLI2(J+241), J = 1030, 1044)
-               E5 = 1.0
-               GO TO 610
-  600          IF (F5 .EQ. 1.0) GO TO 610
-               WRITE (6,10) IRR, ICASE
-               WRITE (6,310)
-               WRITE (6,250) ICALL, IA(I)
-               WRITE (6,260) TBLI2(1286), TBLI2(1302), AL2
-               WRITE (6,270)
-               WRITE (6,280) (TBLI2(J), TBLI2(J+16), TBLI2(J+31),
-     1         TBLI2(J+46), TBLI2(J+61), TBLI2(J+76), TBLI2(J+91),
-     2         TBLI2(J+106), TBLI2(J+121), J = 1287, 1301)
-               WRITE (6,290)
-               WRITE (6,300)  (TBLI2(J+136), TBLI2(J+151), TBLI2(J+166),
-     1         TBLI2(J+181), TBLI2(J+196), TBLI2(J+211), TBLI2(J+226),
-     2         TBLI2(J+241), J = 1287, 1301)
-               F5 = 1.0
-               GO TO 610
-  610          IF (G5. EQ. 1.0) GO TO 630
-  620       CONTINUE
-            IF (I4 .EQ. 0) GO TO 630
+               SELECT CASE (ICALL)
+                  CASE (:1,7:)
+                     IF (A5 .NE. 1.0) THEN
+                       WRITE (6,10)  IRR, ICASE
+                       WRITE (6,310)
+                       WRITE (6,250) ICALL, IA(I)
+                       WRITE (6,260) TBLI2(1), TBLI2(17), AL1
+                       WRITE (6,270)
+                       WRITE (6,280)(TBLI2(J),TBLI2(J+16),TBLI2(J+31),
+     1                 TBLI2(J+46),TBLI2(J+61),TBLI2(J+76),TBLI2(J+91),
+     2                 TBLI2(J+106), TBLI2(J+121), J = 2, 16)
+                       WRITE (6,290)
+                       WRITE (6,300)(TBLI2(J+136),TBLI2(J+151),
+     1                 TBLI2(J+166),TBLI2(J+181), TBLI2(J+196),
+     2                 TBLI2(J+211),TBLI2(J+226),TBLI2(J+241), J=2,16)
+                       A5 = 1.0
+                     END IF
+                  CASE (2)
+                     IF (B5 .NE. 1.0) THEN
+                       WRITE (6,10) IRR, ICASE
+                       WRITE (6,310)
+                       WRITE (6,250) ICALL, IA(I)
+                       WRITE (6,260) TBLI2(258), TBLI2(274), AL2
+                       WRITE (6,270)
+                       WRITE (6,280) (TBLI2(J),TBLI2(J+16),TBLI2(J+31),
+     1                 TBLI2(J+46),TBLI2(J+61),TBLI2(J+76),TBLI2(J+91),
+     2                 TBLI2(J+106), TBLI2(J+121), J = 259, 273)
+                       WRITE (6,290)
+                       WRITE (6,300)  (TBLI2(J+136), TBLI2(J+151),
+     1                 TBLI2(J+166),TBLI2(J+181), TBLI2(J+196),
+     2                 TBLI2(J+211),TBLI2(J+226),
+     3                 TBLI2(J+241),J=259,273)
+                       B5 = 1.0
+                     END IF
+                  CASE (3)
+                     IF (C5 .NE. 1.0) THEN
+                       WRITE (6,10) IRR, ICASE
+                       WRITE (6,310)
+                       WRITE (6,250) ICALL, IA(I)
+                       WRITE (6,260) TBLI2(515), TBLI2(531), AL3
+                       WRITE (6,270)
+                       WRITE (6,280) (TBLI2(J),TBLI2(J+16),TBLI2(J+31),
+     1                 TBLI2(J+46),TBLI2(J+61),TBLI2(J+76),TBLI2(J+91),
+     2                 TBLI2(J+106), TBLI2(J+121), J = 516, 530)
+                       WRITE (6,290)
+                       WRITE (6,300)(TBLI2(J+136), TBLI2(J+151),
+     1                 TBLI2(J+166), TBLI2(J+181), TBLI2(J+196),
+     2                 TBLI2(J+211), TBLI2(J+226),
+     3                 TBLI2(J+241), J = 516, 530)
+                       C5 = 1.0
+                     END IF
+                  CASE (4)
+                     IF (D5 .NE. 1.0) THEN
+                       WRITE (6,10) IRR, ICASE
+                       WRITE (6,310)
+                       WRITE (6,250) ICALL, IA(I)
+                       WRITE (6,260) TBLI2(772), TBLI2(788), AL4
+                       WRITE (6,270)
+                       WRITE (6,280) (TBLI2(J),TBLI2(J+16),TBLI2(J+31),
+     1                 TBLI2(J+46),TBLI2(J+61),TBLI2(J+76),TBLI2(J+91),
+     2                 TBLI2(J+106), TBLI2(J+121), J = 773, 787)
+                       WRITE (6,290)
+                       WRITE (6,300)  (TBLI2(J+136), TBLI2(J+151),
+     1                 TBLI2(J+166), TBLI2(J+181), TBLI2(J+196),
+     2                 TBLI2(J+211), TBLI2(J+226),
+     3                 TBLI2(J+241), J = 773, 787)
+                       D5 = 1.0
+                     END IF
+                  CASE (5)
+                     IF (E5 .NE. 1.0) THEN
+                       WRITE (6,10) IRR, ICASE
+                       WRITE (6,310)
+                       WRITE (6,250) ICALL, IA(I)
+                       WRITE (6,260) TBLI2(1029), TBLI2(1045), AL6
+                       WRITE (6,270)
+                       WRITE (6,280) (TBLI2(J),TBLI2(J+16),TBLI2(J+31),
+     1                 TBLI2(J+46),TBLI2(J+61),TBLI2(J+76),TBLI2(J+91),
+     2                 TBLI2(J+106), TBLI2(J+121), J = 1030, 1044)
+                       WRITE (6,290)
+                       WRITE (6,300)  (TBLI2(J+136), TBLI2(J+151),
+     1                 TBLI2(J+166), TBLI2(J+181), TBLI2(J+196),
+     2                 TBLI2(J+211), TBLI2(J+226),
+     3                 TBLI2(J+241), J = 1030, 1044)
+                       E5 = 1.0
+                     END IF
+                  CASE (6)
+                     IF (F5 .NE. 1.0) THEN
+                       WRITE (6,10) IRR, ICASE
+                       WRITE (6,310)
+                       WRITE (6,250) ICALL, IA(I)
+                       WRITE (6,260) TBLI2(1286), TBLI2(1302), AL2
+                       WRITE (6,270)
+                       WRITE (6,280) (TBLI2(J),TBLI2(J+16),TBLI2(J+31),
+     1                 TBLI2(J+46),TBLI2(J+61),TBLI2(J+76),TBLI2(J+91),
+     2                 TBLI2(J+106), TBLI2(J+121), J = 1287, 1301)
+                       WRITE (6,290)
+                       WRITE (6,300)  (TBLI2(J+136), TBLI2(J+151),
+     1                 TBLI2(J+166), TBLI2(J+181), TBLI2(J+196),
+     2                 TBLI2(J+211), TBLI2(J+226),
+     3                 TBLI2(J+241), J = 1287, 1301)
+                       F5 = 1.0
+                     END IF
+                  END SELECT
+               IF (G5. EQ. 1.0) RETURN
+            END DO
+            IF (I4 .EQ. 0) RETURN
             IA(I) = I4
             G5 = 1.0
-            GO TO 540
-  630       RETURN
+         END DO
+         RETURN
          END
 
-
-
-         SUBROUTINE ONEVAR (ARGUMT, TABLE, OUTPUT, NSEGNM)
-
-C     ONEVAR IS A INTERPOLATION ROUTINGE - ONE FUNCTION OF ONE
-C     VARIABLE, I.E. X=F(Y) - LINEAR OR QUADRATIC.
-C       ARGUMEENTS OF THE SUBROUTINE ARE AS FOLLOWS:
+        SUBROUTINE ONEVAR (ARGUMT, TABLE, OUTPUT, NSEGNM)
+C        ONEVAR IS A INTERPOLATION ROUTINE - ONE FUNCTION OF ONE
+C        VARIABLE, I.E. X=F(Y) - LINEAR OR QUADRATIC.
+C        ARGUMEENTS OF THE SUBROUTINE ARE AS FOLLOWS:
 C          ARGUMT  = INPUT INTERPOLATION ARGUMENT (Y)
 C          NXDIR   = TYPE OF INTEROLATION, 1 FOR LINEAR, 2 FOR QUAD.
 C          TABLE   = SET OF Y VALUES FOLLOWED BY THE X VALUES
@@ -1469,304 +1462,277 @@ C                    3 = OFF CHART HIGH, MAX. VAL. SUBSTITUTED
 C                    4 = NO. OF X ENTRIES IS NOT 2 TO 15 (IF NXDIR
 C                        IS 1). OR, IT IS NOT 3 TO 15 (IF NXDIR) IS 2).
 C                    5 = Y ENTRIES NOT IN ASCENDING ORDER.
-            DIMENSION TABLE(31)
-            NOENTR = TABLE(1) + 0.5
-            NXDIR = 1
-            NER = 0
-            IF (NXDIR-1) 10,10,20
-   10       IF (NOENTR-2) 40,30,30
-   20       IF (NOENTR - 3) 40,30,30
-   30       IF (15 - NOENTR) 40,50,50
-   40       NER = 4
-            GO TO 260
-   50       IF ((ARGUMT + ARGUMT * 0.001) - TABLE(2)) 60,70,90
-   60       NER = 2
-            GO TO 80
-   70       NER = 1
-   80       IOUT = 2
-            GO TO 250
-   90       IF (TABLE(NOETR +1) - ARGUMT) 100,110,140
-  100       NER = 3
-            GO TO 120
-  110       NER = 1
-  120       IOUT = NOENTR + 1
-  130       GO TO 250
-C     AT THIS STEP, ERROR CONDITIONS 2, 3, 4 HAVE
-C     BEEN TESTED FOR AND HAVE PASSED.
-  140       DO 240 JK = 1, NOENTR
-            I = JK
-            IF (I -1) 170,170,150
-  150       IF (TABLE(I + 1) - TABLE(I)) 160,160,170
-  160       NER = 5
-            GO TO 260
-  170       IF (TABLE(I + 1) - ARGUMT) 240,180,190
-  180       NER = 1
-            IOUT = I + 1
-            GO TO 250
-  190       IF (NXDIR -1) 200,200,210
-  200       NER = 1
-            OUTPUT = TABLE(I+15) + (ARGUMT - TABLE(I)) * (TABLE
-     1      (I+16) - TABLE(I+15))/(TABLE(I+1) - TABLE(I))
-            GO TO 360
-  210       IF (NOENTR - 1) 230,220,230
-  220       I = I - 1
-  230       OUTPUT = (TABLE(I+15) * (ARGUMT - TABLE(I+1)) * (ARGUMT -
-     1      TABLE (I+2))) / ((TABLE(I) - TABLE(I+1)) * (TABLE(I) -
-     2      TABLE(I+2))) + (TABLE(I+16) * (ARGUMT - TABLE(I)) *
-     3      (ARGUMT - TABLE(I+2))) / ((TABLE(I+1) - TABLE (I)) *
-     4      (TABLE(I+1) - TABLE(I+2))) + (TABLE(I+17) * (ARGUMT -
-     5      TABLE(I)) * (ARGUMT - TABLE(I+1))) / ((TABLE (I+2) -
-     6      TABLE(I)) * (TABLE (I+2) - TABLE (I+1)))
-            NER = 1
-            GO TO 360
-  240       CONTINUE
-  250       OUTPUT = TABLE(IOUT + 15)
-  260       IF (NER-2) 360,270,290
-  270       WRITE (6,280) ARGUMT, NSEGNM
-  280       FORMAT ('ONEVAR INTEROLATION ERROR. Y IS TOO SMALL.'
-     1              'Y = E14.6', 4X, 'SEG. =', I2)
-  290       IF (NER - 4) 300,320,340
-  300       WRITE (6,310) ARGUMT, NSEGNM
-  310       FORMAT ('ONEVAR INTEROLATION ERROR. Y IS TOO LARGE.'
-     1              'Y = E14.6', 4X, 'SEG. =', I2)
-            GO TO 360
-  320       WRITE (6,330)
-  330       FORMAT ('ONEVAR INTERP. ERROR. THE NO. OF Y ENTRIES IS'
-     1              'EITHER TOO SMALL OR TOO LARGE.', 2X, 'SEG. =', I2)
-            GO TO 360
-  340       WRITE (6,350)
-  350       FORMAT ('ONEVAR INTERP. ERROR. THE NO. OF Y ENTRIES ARE' 
-     1              'NOT IN ASCENDING ORDER.', 2X, 'SEG. =', I2)
-  360       RETURN
+         IMPLICIT NONE
+         REAL TABLE(31), ARGUMT, OUTPUT
+         INTEGER NSEGNM, NOENTR, NXDIR, NER, I
+         NOENTR = TABLE(1) + 0.5
+         NXDIR = 1
+         NER = 1
+         IF (NOENTR.LT.2 .OR. NOENTR.GT.15) THEN
+            WRITE (6,330)
+            NER=4
+            RETURN
+         END IF
+         IF (ANY(TABLE(2:NOENTR).GE.TABLE(3:NOENTR+1))) THEN
+            WRITE (6,350)
+            NER=5
+            RETURN
+         END IF
+         IF (ARGUMT.LT. TABLE(2)) THEN
+            WRITE (6,280) ARGUMT
+            NER=2
+            OUTPUT = TABLE(2 + 15)
+            RETURN
+         END IF
+         IF (ARGUMT.GT. TABLE(NOENTR+1)) THEN
+            WRITE (6,310) ARGUMT
+            NER=3
+            OUTPUT = TABLE(NOENTR+1 + 15)
+            RETURN
+         END IF
+         I=MINLOC(TABLE(2:NOENTR+1),1,
+     1     MASK=(TABLE(2:NOENTR+1).GT.ARGUMT))
+         OUTPUT = TABLE(I+15) + (ARGUMT - TABLE(I)) * (TABLE
+     1   (I+16) - TABLE(I+15))/(TABLE(I+1) - TABLE(I))
+         RETURN
+  280    FORMAT ('ONEVAR INTEROLATION ERROR. Y IS TOO SMALL.',
+     1           ' Y = ',E14.6)
+  310    FORMAT ('ONEVAR INTEROLATION ERROR. Y IS TOO LARGE.',
+     1           ' Y = ',E14.6)
+  330    FORMAT ('ONEVAR INTERP. ERROR. THE NO. OF Y ENTRIES IS',
+     1           ' EITHER TOO SMALL OR TOO LARGE.')
+  350    FORMAT ('ONEVAR INTERP. ERROR. THE NO. OF Y ENTRIES ARE', 
+     1           ' NOT IN ASCENDING ORDER.')
          END
 
 
 
-         SUBROUTINE TWOVIN (XARG, YARG, TABLE, OUTPUT, NSEG, LEVEL)
+      SUBROUTINE TWOVIN (XARG, YARG, TABLE, OUTPUT, NSEG, LEVEL)
 
 C     ARUGMENTS OF THE SUBROUTINE ARE AS FOLLOWS:
-C        XARG   = INPUT INTERPOLATION ARGUMENT (X)
-C        YARG   = INPUT INTERPOLATION ARGUMENT (Y)
-C        TABLE  = SET OF VALUES. SEE DESRIPTION OF THIS
-C        OUTPUT = INTERPOLATED VALUE OF Z = F(X,Y)
-            DIMENSION TABLE(257)
-   10       FORMAT ('SN INTERP. ERROR. Y IS TOO SMALL. Y = ',E14.6,2X,
-     1      'SEG = ', I3, 2X, 'LOAD LEVEL =', I3)
-   20       FORMAT ('SN INTERP. ERROR. Y IS TOO LARGE. Y = ',E14.6,2X,
-     1      'SEG = ', I3, 2X, 'LOAD LEVEL = ', I3)
-   30       FORMAT ('SN INTERP. ERROR. Y IS TOO LARGE. X = ',E14.6,2X,
-     1      'SEG = ', I3, 2X, 'LOAD LEVEL = ', I3, 2X)
-   40       FORMAT ('SN INTERP. ERROR. X IS TOO LARGE. X = ',E14.6,2X,
-     1      'Y IS TOO SMALL. Y = ',E14.6, 2X, 'SEG = ', I3, 2X,
-     2      'LOAD LEVEL = ', I3)
-   50       FORMAT ('SN INTERP. ERROR. X IS TOO LARGE. X = ',E14.6,2X,
-     1      'Y IS TOO LARGE. Y = ',E14.6, 2X, 'SEG = ', I3, 2X,
-     2      'LOAD LEVEL = ', I3)
-   60       FORMAT ('SN INTERP. ERROR. Y IS TOO SMALL. Y = ',E14.6,2X,
-     1      'X = ',E14.6, 2X, '(GAG SEGMENT)')
-   70       FORMAT ('SN INTERP. ERROR. Y IS TOO LARGE. Y = ',E14.6,2X,
-     1      'X = ',E14.6, 2X, '(GAG SEGMENT)')
-   80       FORMAT ('SN INTERP. ERROR. X IS TOO LARGE. X = ',E14.6,2X,
-     1      'Y = ',E14.6, 2X, '(GAG SEGMENT)')
-   90       FORMAT ('SN INTERP. ERROR. X IS TOO LARGE. X = ',E14.6,2X,
-     1      'Y = ',E14.6, 2X, '(GAG SEGMENT)')
-  100       FORMAT ('SN INTERP. ERROR. X IS TOO LARGE. X = ',E14.6,2X,
-     1      'Y IS TOO LARGE. Y = ',E14.6, 2X, '(GAG SEGMENT)')
-  110       FORMAT ('GUST ALLEV. INTRP. ERROR. Y IS TOO SMALL',
-     1      'Y = ',E14.6, 2X, 'SEG =', I3)
-  120       FORMAT ('GUST ALLEV. INTRP. ERROR. Y IS TOO LARGE',
-     1      'Y = ',E14.6, 2X, 'SEG =', I3)
-  130       FORMAT ('GUST ALLEV. INTRP. ERROR. X IS TOO LARGE',
-     1      'X = ',E14.6, 2X, 'SEG =', I3)
-  140       FORMAT ('GUST ALLEV. INTRP. ERROR. X IS TOO LARGE',
-     1      'X = ',E14.6, 2X,'Y IS TOO SMALL. Y = ',E14.6,1X,'SEG =', 
-     2      I3)
-  150       FORMAT ('GUST ALLEV. INTRP. ERROR. X IS TOO LARGE',
-     1      'X = ',E14.6,2X,'Y IS TOO LARGE. Y = ',E14.6,1X,'SEG =', 
-     2      I3)
-            write(10,*) 'tw: ',XARG, YARG, TABLE, OUTPUT, NSEG, LEVEL
-            J5 = 0
-            K = 0
-            NER = 0
-            NER2 = 0
-            NER5 = 0
-            NXDIR = 2
-            NXENTR = TABLE(17) + 0.5
-            NYENTR = TABLE(1) + 0.5
-  160       DO 300 JK = 1,NYENTR
-               IY = JK
-               IF (IY -1) 230,230,170
-  170          IF (IY - NYENTR) 180,200,200
-  180          IF (TABLE(IY+1) - TABLE(IY)) 190,190,260
-  190          NER = 9
-               GO TO 740
-  200          IF (TABLE(IY+1) - YARG) 210,220,310
-  210          NER = 3
-               NER2 = 13
-  220          J5 = 1
-               IY = IY + 1
-               GO TO 310
-  230          IF (TABLE(IY + 1) - YARG) 270,250,240
-  240          NER = 2
-               NER2 = 12
-  250          IY = IY + 1
-               J5 = 1
-               GO TO 310
-  260          IF (TABLE (IY + 1) - YARG) 280,310,310
-  270          CYINT = ((YARG - TABLE(IY + 1)) / (TABLE(IY + 2) - 
-     1                   TABLE(IY + 1)))
-               IF (CYINT - 0.001) 250,300,300
-  280          CYINT = ((YARG - TABLE(IY + 1)) / (TABLE(IY +1) - 
-     1                   TABLE(IY)))
-  290          IF (CYINT - 0.001) 310,300,300
-  300       CONTINUE
-  310       DO 460 JK = 1,NXENTR
-               IX = JK
-               IF (IX -1) 420,420,320
-  320          IF (IX - NXENTR) 330,390,390
-  330          IF (TABLE(IX + 17) - TABLE(IX + 16))340,340,450
-  340          NER = 9
-               GO TO 740
-  350          NER = 5       ! corrected by PSV
-               NER5 = 13     !
-  360          IX = IX + 1
-               IF (J5 .EQ. 1) GO TO 470
-               GO TO 480
-  370          CKINT = ABS((TABLE(IX+17) - XARG) / (TABLE(IX+18) - 
-     1                 TABLE(IX+17)))
-  380          IF (CKINT - 0.50)480,480,460
-  390          IF (TABLE(IX+17) - XARG)350,360,400
-  400          CKINT = ABS((TABLE(IX+17) - XARG)/(TABLE(IX+17) - 
-     1         TABLE(IX+16)))
-               IF(CKINT - 0.50)410,410,350
-  410          IX = IX - 1
-               goto 480 !psv
-  420          IF (TABLE(IX+17) - XARG) 460,460,430
-  430          NER = 4
-  440          IX = IX + 1
-               GO TO 480
-  450          IF (TABLE (IX+17) - XARG) 370,370,480
-  460       CONTINUE
-  470       IN = 15 * IY + 1 + IX
-            OUTPUT = ALOG10(TABLE(IN))
-            write(9,*) 'TWOVIN 470', OUTPUT
-            GO TO 710
-  480       IN = 15 * IY + 1 + IX
-            AN1 = ALOG10(TABLE(IN))
-            IBOUND = (NXENTR - 1)
-            IF (IX .GT. NXENTR) GO TO 510
-            AN2 = ALOG10(TABLE(IN + 1))
-            IF ((IX .EQ. NXENTR) .AND. (J5 .EQ. 1)) GO TO 500
-            IF ((IX .EQ. NXENTR) .AND. (J5 .EQ. 0)) GO TO 490
-            AN3 = ALOG10(TABLE(IN + 2))
-            IF (IY .GT. NYENTR) GO TO 500
-            AN5 = ALOG10(TABLE(IN + 17))
-            AN6 = ALOG10(TABLE(IN + 16))
-            IF (IX .EQ. IBOUND) GO TO 510
-            AN4 = ALOG10(TABLE(IN + 18))
-            GO TO 510
-  490       AN6 = ALOG10(TABLE(IN + 16))
-            GO TO 510
-  500       AN4 = AN2
-            AN5 = AN2
-            AN6 = AN1
-  510       IF (NXDIR - 1) 520,520,600
-  520       IF (J5 - 1) 540,530,540
-  530       BX = 0.0
-            GO TO 550
-  540       BX = ((YARG - TABLE(IY)) / (TABLE(IY + 1) - TABLE(IY)))
-  550       IF (IX - NXENTR) 570,570,560
-  560       OUTPUT = ALOG10(TABLE(IN)) + BX * (ALOG10(TABLE(IN + 15)) -
-     1      ALOG10(TABLE(IN)))
-            write(9,*) 'TWOVIN 560', OUTPUT
-            GO TO 710
-  570       XARGMX = TABLE(NXENTR + 17)
-            IF (TABLE(IX + 17) - XARGMX) 590,580,580
-  580       TABLE(IX + 18) = TABLE(IX + 17)
-            TABLE(IN + 17) = TABLE(IN + 16)
-  590       CX = XARG - (TABLE(IX + 16) + BX * (TABLE(IX + 17) -
-     1      TABLE(IX + 16)))
-            DX = ALOG10(TABLE(IN + 1)) + BX * (ALOG10(TABLE(IN + 17)) -
-     1      ALOG10(TABLE(IN + 1)))
-            EX = ALOG10(TABLE(IN)) + BX * (ALOG10(TABLE(IN + 16)) -
-     1      ALOG10(TABLE(IN)))
-            FX = TABLE(IX + 17) - TABLE(IX + 16) + BX * (TABLE(IX + 18) 
-     1           - 2.0 * TABLE (IX + 17) + TABLE(IX + 16))
-            IF (FX .EQ. 0.0) FX = 1.0
-            OUTPUT = ALOG10(TABLE(IN)) + BX * (ALOG10(TABLE(IN + 16)) -
-     1      ALOG10(TABLE(IN))) + (((CX) * (DX - EX)) / (FX))
-            write(9,*) 'TWOVIN 590', OUTPUT
-            GO TO 710
-  600       IF (J5 - 1) 620,610,620
-  610       BX = 0.0
-            GO TO 630
-  620       BX = ((YARG - TABLE(IY)) / (TABLE(IY + 1) - TABLE(IY)))
-  630       IF (IX - NXENTR) 650,650,640
-  640       AN7 = ALOG10(TABLE(IN + 15))
-            OUTPUT = AN1 + BX * (AN7 - AN1)
-            GO TO 710
-  650       IBOUND = NXENTR - 1
-            IF (IX .EQ. IBOUND) GO TO 670
-            XARGMX = TABLE(NXENTR + 17)
-            IF (TABLE(IX + 17) - XARGMX) 680,660,660
-  660       TABLE(IX + 18) = TABLE(IX + 17)
-            AN3 = AN2
-            AN5 = AN2
-  670       TABLE(IX + 19) = TABLE(IX + 17)
-            IF (IX .EQ. IBOUND) TABLE(IX + 19) = TABLE(IX + 18)
-            AN4 = AN5
-  680       CX = TABLE (IX + 18) + BX * (TABLE(IX + 19) - 
-     1           TABLE (IX + 18))
-            DX = TABLE (IX + 17) + BX * (TABLE(IX + 18) - 
-     1           TABLE (IX + 17))
-            EX = TABLE (IX + 16) + BX * (TABLE(IX + 17) - 
-     1           TABLE (IX + 16))
-            FX = AN3 + BX * (AN4 - AN3)
-            GX = AN2 + BX * (AN5 - AN2)
-            HX = AN1 + BX * (AN6 - AN1)
-            IF (( IX .GE. IBOUND) .AND. ((BX * 1.001) .GE. 1.0)) 
-     1         GO TO 700
-  690       OUTPUT = (HX * (((XARG - DX) * (XARG - CX)) / ((EX - DX) *
-     1      (EX - CX)))) + (GX * (((XARG - EX) * (XARG - CX)) / 
-     2      ((DX - EX) * (DX - CX)))) + (FX * (((XARG - EX) * 
-     3      (XARG - DX)) / ((CX - EX) * (CX - DX))))
-            GO TO 710
-  700       OUTPUT = GX + (HX - GX) * ((DX - XARG) / (DX - EX))
-  710       IF (NSEG .EQ. 50) GO TO 720
-            IF (NSEG .GT. 50) GO TO 730
-            IF (NER .EQ. 2) WRITE(6,10) YARG, NSEG, LEVEL
-            IF (NER .EQ. 3) WRITE(6,20) YARG, NSEG, LEVEL
-            IF ((NER .EQ. 5) .AND. (NER2 .EQ. 0)) WRITE(6,30) YARG, 
-     1         NSEG, LEVEL
-            IF ((NER2 .EQ. 12) .AND. (NER5 .EQ. 13)) WRITE(6,40) YARG, 
-     1         NSEG, LEVEL
-            IF ((NER2 .EQ. 13) .AND. (NER5 .EQ. 13)) WRITE(6,50) YARG, 
-     1         NSEG, LEVEL
-            GO TO 760
-  720       IF (NER .EQ. 2) WRITE(6,60) YARG, XARG
-            IF (NER .EQ. 3) WRITE(6,70) YARG, XARG
-            IF ((NER .EQ. 5) .AND. (NER2 .EQ. 0)) WRITE(6,80) YARG, 
-     1         NSEG, LEVEL
-            IF ((NER2 .EQ. 12) .AND. (NER5 .EQ. 13)) WRITE(6,90) XARG, 
-     1         YARG
-            IF ((NER2 .EQ. 13) .AND. (NER5 .EQ. 13)) WRITE(6,100) XARG, 
-     1         YARG
-            GO TO 760
-  730       NSEG = ( NSEG - 50)
-            IF (NER .EQ. 2) WRITE (6,110) YARG, NSEG
-            IF (NER .EQ. 3) WRITE (6,120) YARG, NSEG
-            IF ((NER .EQ. 5) .AND. (NER2 .EQ. 0)) WRITE(6,130) XARG, 
-     1         NSEG
-            IF ((NER2 .EQ. 12) .AND. (NER5 .EQ. 13)) WRITE(6,140) XARG, 
-     1         YARG, NSEG
-            IF ((NER2 .EQ. 13) .AND. (NER5 .EQ. 13)) WRITE(6,150) XARG, 
-     1         YARG, NSEG
-            GO TO 760
-  740       WRITE (6,750)
-  750       FORMAT ('TWOVIN INTERPOLATION ERROR. EITHER THE'
-     1       'X OR THE Y ENTRIES ARE NOT IN ASCENDING ORDER.')
-  760       RETURN
-         END
+C     XARG   = INPUT INTERPOLATION ARGUMENT (X)
+C     YARG   = INPUT INTERPOLATION ARGUMENT (Y)
+C     TABLE  = SET OF VALUES. SEE DESRIPTION OF THIS
+C     OUTPUT = INTERPOLATED VALUE OF Z = F(X,Y)
+         DIMENSION TABLE(257)
+   10    FORMAT ('SN INTERP. ERROR. Y IS TOO SMALL. Y = ',E14.6,2X,
+     1   'SEG = ', I3, 2X, 'LOAD LEVEL =', I3)
+   20    FORMAT ('SN INTERP. ERROR. Y IS TOO LARGE. Y = ',E14.6,2X,
+     1   'SEG = ', I3, 2X, 'LOAD LEVEL = ', I3)
+   30    FORMAT ('SN INTERP. ERROR. X IS TOO LARGE. X = ',E14.6,2X,
+     1   'SEG = ', I3, 2X, 'LOAD LEVEL = ', I3, 2X)
+   40    FORMAT ('SN INTERP. ERROR. X IS TOO LARGE. X = ',E14.6,2X,
+     1   'Y IS TOO SMALL. Y = ',E14.6, 2X, 'SEG = ', I3, 2X,
+     2   'LOAD LEVEL = ', I3)
+   50    FORMAT ('SN INTERP. ERROR. X IS TOO LARGE. X = ',E14.6,2X,
+     1   'Y IS TOO LARGE. Y = ',E14.6, 2X, 'SEG = ', I3, 2X,
+     2   'LOAD LEVEL = ', I3)
+   60    FORMAT ('SN INTERP. ERROR. Y IS TOO SMALL. Y = ',E14.6,2X,
+     1   'X = ',E14.6, 2X, '(GAG SEGMENT)')
+   70    FORMAT ('SN INTERP. ERROR. Y IS TOO LARGE. Y = ',E14.6,2X,
+     1   'X = ',E14.6, 2X, '(GAG SEGMENT)')
+   80    FORMAT ('SN INTERP. ERROR. X IS TOO LARGE. X = ',E14.6,2X,
+     1   'Y = ',E14.6, 2X, '(GAG SEGMENT)')
+   90    FORMAT ('SN INTERP. ERROR. X IS TOO LARGE. X = ',E14.6,2X,
+     1   'Y = ',E14.6, 2X, '(GAG SEGMENT)')
+  100    FORMAT ('SN INTERP. ERROR. X IS TOO LARGE. X = ',E14.6,2X,
+     1   'Y IS TOO LARGE. Y = ',E14.6, 2X, '(GAG SEGMENT)')
+  110    FORMAT ('GUST ALLEV. INTRP. ERROR. Y IS TOO SMALL',
+     1   'Y = ',E14.6, 2X, 'SEG =', I3)
+  120    FORMAT ('GUST ALLEV. INTRP. ERROR. Y IS TOO LARGE',
+     1   'Y = ',E14.6, 2X, 'SEG =', I3)
+  130    FORMAT ('GUST ALLEV. INTRP. ERROR. X IS TOO LARGE',
+     1   'X = ',E14.6, 2X, 'SEG =', I3)
+  140    FORMAT ('GUST ALLEV. INTRP. ERROR. X IS TOO LARGE',
+     1   'X = ',E14.6, 2X,'Y IS TOO SMALL. Y = ',E14.6,1X,'SEG =', 
+     2   I3)
+  150    FORMAT ('GUST ALLEV. INTRP. ERROR. X IS TOO LARGE',
+     1   'X = ',E14.6,2X,'Y IS TOO LARGE. Y = ',E14.6,1X,'SEG =', 
+     2   I3)
+         write(10,*) 'tw: ',XARG, YARG, TABLE, OUTPUT, NSEG, LEVEL
+         J5 = 0
+         K = 0
+         NER = 0
+         NER2 = 0
+         NER5 = 0
+         NXDIR = 2
+         NXENTR = TABLE(17) + 0.5
+         NYENTR = TABLE(1) + 0.5
+  160    DO 300 JK = 1,NYENTR
+            IY = JK
+            IF (IY -1) 230,230,170
+  170       IF (IY - NYENTR) 180,200,200
+  180       IF (TABLE(IY+1) - TABLE(IY)) 190,190,260
+  190       NER = 9
+            GO TO 740
+  200       IF (TABLE(IY+1) - YARG) 210,220,310
+  210       NER = 3
+            NER2 = 13
+  220       J5 = 1
+            IY = IY + 1
+            GO TO 310
+  230       IF (TABLE(IY + 1) - YARG) 270,250,240
+  240       NER = 2
+            NER2 = 12
+  250       IY = IY + 1
+            J5 = 1
+            GO TO 310
+  260       IF (TABLE (IY + 1) - YARG) 280,310,310
+  270       CYINT = ((YARG - TABLE(IY + 1)) / (TABLE(IY + 2) - 
+     1                TABLE(IY + 1)))
+            IF (CYINT - 0.001) 250,300,300
+  280       CYINT = ((YARG - TABLE(IY + 1)) / (TABLE(IY +1) - 
+     1                TABLE(IY)))
+  290       IF (CYINT - 0.001) 310,300,300
+  300    CONTINUE
+  310    DO 460 JK = 1,NXENTR
+            IX = JK
+            IF (IX -1) 420,420,320
+  320       IF (IX - NXENTR) 330,390,390
+  330       IF (TABLE(IX + 17) - TABLE(IX + 16))340,340,450
+  340       NER = 9
+            GO TO 740
+  350       NER = 5       ! corrected by PSV
+            NER5 = 13     !
+  360       IX = IX + 1
+            IF (J5 .EQ. 1) GO TO 470
+            GO TO 480
+  370       CKINT = ABS((TABLE(IX+17) - XARG) / (TABLE(IX+18) - 
+     1              TABLE(IX+17)))
+  380       IF (CKINT - 0.50)480,480,460
+  390       IF (TABLE(IX+17) - XARG)350,360,400
+  400       CKINT = ABS((TABLE(IX+17) - XARG)/(TABLE(IX+17) - 
+     1      TABLE(IX+16)))
+            IF(CKINT - 0.50)410,410,350
+  410       IX = IX - 1
+            goto 480 !psv
+  420       IF (TABLE(IX+17) - XARG) 460,460,430
+  430       NER = 4
+  440       IX = IX + 1
+            IF (J5 .EQ. 1) GO TO 470
+            GO TO 480
+  450       IF (TABLE (IX+17) - XARG) 370,370,480
+  460    CONTINUE
+  470    IN = 15 * IY + 1 + IX
+         OUTPUT = ALOG10(TABLE(IN))
+         write(9,*) 'TWOVIN 470', OUTPUT
+         GO TO 710
+  480    IN = 15 * IY + 1 + IX
+         AN1 = ALOG10(TABLE(IN))
+         IBOUND = (NXENTR - 1)
+         IF (IX .GT. NXENTR) GO TO 510
+         AN2 = ALOG10(TABLE(IN + 1))
+         IF ((IX .EQ. NXENTR) .AND. (J5 .EQ. 1)) GO TO 500
+         IF ((IX .EQ. NXENTR) .AND. (J5 .EQ. 0)) GO TO 490
+         AN3 = ALOG10(TABLE(IN + 2))
+         IF (IY .GT. NYENTR) GO TO 500
+         AN5 = ALOG10(TABLE(IN + 17))
+         AN6 = ALOG10(TABLE(IN + 16))
+         IF (IX .EQ. IBOUND) GO TO 510
+         AN4 = ALOG10(TABLE(IN + 18))
+         GO TO 510
+  490    AN6 = ALOG10(TABLE(IN + 16))
+         GO TO 510
+  500    AN4 = AN2
+         AN5 = AN2
+         AN6 = AN1
+  510    IF (NXDIR - 1) 520,520,600
+  520    IF (J5 - 1) 540,530,540
+  530    BX = 0.0
+         GO TO 550
+  540    BX = ((YARG - TABLE(IY)) / (TABLE(IY + 1) - TABLE(IY)))
+  550    IF (IX - NXENTR) 570,570,560
+  560    OUTPUT = ALOG10(TABLE(IN)) + BX * (ALOG10(TABLE(IN + 15)) -
+     1   ALOG10(TABLE(IN)))
+         write(9,*) 'TWOVIN 560', OUTPUT
+         GO TO 710
+  570    XARGMX = TABLE(NXENTR + 17)
+         IF (TABLE(IX + 17) - XARGMX) 590,580,580
+  580    TABLE(IX + 18) = TABLE(IX + 17)
+         TABLE(IN + 17) = TABLE(IN + 16)
+  590    CX = XARG - (TABLE(IX + 16) + BX * (TABLE(IX + 17) -
+     1   TABLE(IX + 16)))
+         DX = ALOG10(TABLE(IN + 1)) + BX * (ALOG10(TABLE(IN + 17)) -
+     1   ALOG10(TABLE(IN + 1)))
+         EX = ALOG10(TABLE(IN)) + BX * (ALOG10(TABLE(IN + 16)) -
+     1   ALOG10(TABLE(IN)))
+         FX = TABLE(IX + 17) - TABLE(IX + 16) + BX * (TABLE(IX + 18) 
+     1        - 2.0 * TABLE (IX + 17) + TABLE(IX + 16))
+         IF (FX .EQ. 0.0) FX = 1.0
+         OUTPUT = ALOG10(TABLE(IN)) + BX * (ALOG10(TABLE(IN + 16)) -
+     1   ALOG10(TABLE(IN))) + (((CX) * (DX - EX)) / (FX))
+         write(9,*) 'TWOVIN 590', OUTPUT
+         GO TO 710
+  600    IF (J5 - 1) 620,610,620
+  610    BX = 0.0
+         GO TO 630
+  620    BX = ((YARG - TABLE(IY)) / (TABLE(IY + 1) - TABLE(IY)))
+  630    IF (IX - NXENTR) 650,650,640
+  640    AN7 = ALOG10(TABLE(IN + 15))
+         OUTPUT = AN1 + BX * (AN7 - AN1)
+         GO TO 710
+  650    IBOUND = NXENTR - 1
+         IF (IX .EQ. IBOUND) GO TO 670
+         XARGMX = TABLE(NXENTR + 17)
+         IF (TABLE(IX + 17) - XARGMX) 680,660,660
+  660    TABLE(IX + 18) = TABLE(IX + 17)
+         AN3 = AN2
+         AN5 = AN2
+  670    TABLE(IX + 19) = TABLE(IX + 17)
+         IF (IX .EQ. IBOUND) TABLE(IX + 19) = TABLE(IX + 18)
+         AN4 = AN5
+  680    CX = TABLE (IX + 18) + BX * (TABLE(IX + 19) - 
+     1        TABLE (IX + 18))
+         DX = TABLE (IX + 17) + BX * (TABLE(IX + 18) - 
+     1        TABLE (IX + 17))
+         EX = TABLE (IX + 16) + BX * (TABLE(IX + 17) - 
+     1        TABLE (IX + 16))
+         FX = AN3 + BX * (AN4 - AN3)
+         GX = AN2 + BX * (AN5 - AN2)
+         HX = AN1 + BX * (AN6 - AN1)
+         IF (( IX .GE. IBOUND) .AND. ((BX * 1.001) .GE. 1.0)) 
+     1      GO TO 700
+  690    OUTPUT = (HX * (((XARG - DX) * (XARG - CX)) / ((EX - DX) *
+     1   (EX - CX)))) + (GX * (((XARG - EX) * (XARG - CX)) / 
+     2   ((DX - EX) * (DX - CX)))) + (FX * (((XARG - EX) * 
+     3   (XARG - DX)) / ((CX - EX) * (CX - DX))))
+         GO TO 710
+  700    OUTPUT = GX + (HX - GX) * ((DX - XARG) / (DX - EX))
+  710    IF (NSEG .EQ. 50) GO TO 720
+         IF (NSEG .GT. 50) GO TO 730
+         IF (NER .EQ. 2) WRITE(6,10) YARG, NSEG, LEVEL
+         IF (NER .EQ. 3) WRITE(6,20) YARG, NSEG, LEVEL
+         IF ((NER .EQ. 5) .AND. (NER2 .EQ. 0)) WRITE(6,30) XARG, 
+     1      NSEG, LEVEL
+         IF ((NER2.EQ.12) .AND. (NER5.EQ.13)) WRITE(6,40)XARG,YARG,
+     1      NSEG, LEVEL
+         IF ((NER2.EQ.13) .AND. (NER5.EQ.13)) WRITE(6,50)XARG,YARG,
+     1      NSEG, LEVEL
+         GO TO 760
+  720    IF (NER .EQ. 2) WRITE(6,60) YARG, XARG
+         IF (NER .EQ. 3) WRITE(6,70) YARG, XARG
+         IF ((NER .EQ. 5) .AND. (NER2 .EQ. 0)) WRITE(6,80) XARG, 
+     1      NSEG, LEVEL
+         IF ((NER2 .EQ. 12) .AND. (NER5 .EQ. 13)) WRITE(6,90) XARG, 
+     1      YARG
+         IF ((NER2 .EQ. 13) .AND. (NER5 .EQ. 13)) WRITE(6,100) XARG, 
+     1      YARG
+         GO TO 760
+  730    NSEG = NSEG - 50
+         IF (NER .EQ. 2) WRITE (6,110) YARG, NSEG
+         IF (NER .EQ. 3) WRITE (6,120) YARG, NSEG
+         IF ((NER .EQ. 5) .AND. (NER2 .EQ. 0)) WRITE(6,130) XARG, 
+     1      NSEG
+         IF ((NER2 .EQ. 12) .AND. (NER5 .EQ. 13)) WRITE(6,140) XARG, 
+     1      YARG, NSEG
+         IF ((NER2 .EQ. 13) .AND. (NER5 .EQ. 13)) WRITE(6,150) XARG, 
+     1      YARG, NSEG
+         GO TO 760
+  740    WRITE (6,750)
+  750    FORMAT ('TWOVIN INTERPOLATION ERROR. EITHER THE'
+     1    'X OR THE Y ENTRIES ARE NOT IN ASCENDING ORDER.')
+  760    RETURN
+      END
 
 
          SUBROUTINE RDMAIN
@@ -1789,10 +1755,8 @@ C*********  SUBROUTINES CALLED - ERROR, INPUTF, NEWPG
             NSIZE = 28000
             NEXT = 1
             NOW = 1
-            DO 10 I = 1,20
-   10       TITLE(I) = BLANK
-            READ (5,20) (TITLE(I), I = 1,20)
-   20       FORMAT (20A4)
+            TITLE = BLANK
+            READ (5,'(20A4)') (TITLE(I), I = 1,20)
             NPG = 1
             CALL NEWPG
             IERR = 0
@@ -1856,7 +1820,7 @@ C*********  SUBROUTINES CALLED -ERROR, INF1F2
             DIMENSION NF(NFT), NS(NFT), A(*)
             COMMON NPG, TITLE(20), NSIZE, LEFT, IERR, IRS, IUIL, NPI, 
      1             NRAN, IVP, IFI, NXY, CLIP, CLIV, FACTOR, ELIMP, 
-     2             ELIMV, IPFS, NPSS, IPTF, IAFT, NEXT, NOW, IFRS
+     2             ELIMV, IPFS, NPSS, IPTF, IAFS, NEXT, NOW, IFRS
 C*********  READ IN THE NUMBER OF FLIGHTS IN EACH FLIGHT TYPE
             READ (5,*) NF
 C*********  READ IN THE NUMBER OF SEGMENTS IN EACH FLIGHT TYPE
@@ -1864,12 +1828,9 @@ C*********  READ IN THE NUMBER OF SEGMENTS IN EACH FLIGHT TYPE
    10       FORMAT (1X,15I7)
 C*********  COMPUTE THE TOTAL NUMBER OF FLIGHTS
 C*********      AND THE TOTAL NUMBER OF SEGMENTS.
-            NST = 0
-            NTF = 0
-            DO 20 I = 1, NFT
-               NST = NST + NS(I)
-               NTF = NTF + NF(I)
-   20       CONTINUE
+
+            NST = SUM(NS(1:NFT))
+            NTF = SUM(NF(1:NFT))
 C*********  CALCULATE THE STARTING POIT FOR EACH ARRAY WITHIN
 C*********  THE A ARRAY.
             MPI = 1
@@ -1881,260 +1842,11 @@ C*********  THE A ARRAY.
             MF2 = MF1 + NST
             MFRS = MF2 + NST
             MN = MFRS + (2 * IFRS)
-            LEFT = LEFT - (2 * (NST + NXY + IFRS) + IVP + NRAN + NPI + 
-     1             NPSS)
-            IF (LEFT . LT. 0) CALL ERROR (1, LEFT, NSIZE, NST)
+            LEFT = LEFT - (2*(NST+NXY+IFRS) + IVP + NRAN + NPI + NPSS)
+            IF (LEFT .LT. 0) CALL ERROR (1, LEFT, NSIZE, NST)
             CALL INF1F2 (NST, NFT, NS, A(MF1), A(MF2), A(MN), NF1ST, 
      1                   NF2ST, NTF, NF, A(MPI), A(MRAN), A(MVP), 
      2                   A(MXY), IRAN, IPI, KVP, A(MISS), A(MFRS))
-            RETURN
-         END
-
-
-
-         SUBROUTINE INF1F2 (NST, NFT, NS, IF1, IF2, N, NF1ST, NF2ST, 
-     1                      NTF, NF, PI, RAN, VP, XY, IRAN, IPI, KVP, 
-     2                      ISS, NFRS)
-C*********  THIS SUBROUTINE READS AND PRINTS THE REMAINDER OF THE  *****
-C*********  INPUT DATA.  IT SETS UP THE CORE STORAGE REQUIRED FOR  *****
-C*********  THE CALLS TO SUBROUTINES INMMN, GENFL, AND GENAFS.     *****
-C*********  SUBROUTINES CALLED - ERROR, GENAFS, GENFL, INMMN,      *****
-C*********                       NEWPG, OPENMS, WTAPE              *****
-            DIMENSION NS(NFT), IF1(NST), IF2(NST), N(*), NF(NFT), 
-     1                NFRS(2,1)
-            DIMENSION PI(1), RAN(*), VP(*), XY(2,1), ISS (*)
-            COMMON NPG, TITLE(20), NSIZE, LEFT, IERR, IRS, IUIL, NPI, 
-     1             NRAN, IVP, IFI, NXY, CLIP, CLIV, FACTOR, ELIMP, 
-     2             ELIMV, IPFS, NPSS, IPTF, IAFT, NEXT, NOW, IFRS
-            !write(11,*) 'NS ',NS
-            LINE = 60
-   10       FORMAT ('INF1F2',13I7)
-   20       FORMAT ('INF1F2',10F12.2)
-            IF (IPI .GT.0) GO TO 30
-C*********  READ IN AND PRINT ALL PEAK LEVELS(IPI) 0
-            READ (5,*) (PI(I), I = 1, NPI)
-            GO TO 50
-C*********  READ IN AND PRINT FIRST AND LAST PEAK LEVELS.
-C*********  LET THE PROGRAM COMPUTE EVENLY SPACED VALUES.
-   30       READ (5,*) PI(1), PI(NPI)
-            ND = NPI - 1
-            DEL = (PI(NPI) - PI(1)) / ND
-            DO 40 i = 2, ND
-   40       PI(I) = PI(I-1) + DEL
-   50       WRITE (6,60) (PI(I), I = 1, NPI)
-   60       FORMAT (5X, 'PEAK LEVELS FOR SPECTRUM SUMATION' / (10F12.0))
-            write(11,*) 'NS ',NS
-            IF (IRAN .GT. 0) GO TO 80
-C********* READ IN AND PRINT ALL RANGE LEVELS (IRAN) 0)
-   70       READ (5,*) (RAN(I), I = 1, NRAN)
-            GO TO 100
-C*********  READ IN AND PRINT FIRST AND LAST RANGE LEVELS.
-C*********  LET THE PROGRAM COMPUTE EVENLY SPACED VALUES.
-   80       READ (5,*) RAN(1), RAN(NRAN)
-            ND = NRAN - 1
-            DEL = (RAN(NRAN) - RAN (1)) / ND
-            DO 90 I = 2,ND
-   90       RAN(I) = RAN(I-1) + DEL
-  100       WRITE (6,110) (RAN(I), I = 1, NRAN)
-  110       FORMAT (5X, 'INPUT RANGE LEVELS FOR SPECTRUM SUMMATION' /
-     1      (10F12.0))
-            WRITE (11,*) 'RAN ',(RAN(I), I = 1, NRAN)
-            IF (KVP .GT. 0) GO TO 120
-C********** READ IN AND PRINT ALL TEH VALLEY/PEAK RETIOS (KVP) 0)
-            READ (5,*) (VP(I), I = 1, IVP)
-            GO TO 140
-C********** READ IN AND PRING FIRT AND LAST VALLEY/PEAK RATIOS.
-C********** LET THE PROGRAM COMPUTE EVELY SPACED VALUES.
-  120       READ (5,*) VP(1), VP(IVP)
-            ND = IVP - 1
-            DEL = (VP(IVP) - VP(1)) / ND
-            DO 130 i = 2, ND
-  130       VP(I) = VP(I-1) + DEL
-  140       WRITE (6,150) (VP(I), I = 1, IVP)
-  150       FORMAT (5X, 'INPUT VALLEY/PEAK RATIOS FOR SPECTRUM '
-     1              'SUMMATION'/ 5X, 18F7.3)
-            WRITE (11,*) 'VP ',(VP(I), I = 1, IVP)
-            IF (NXY .EQ. 0) GO TO 170
-C*********** READ IN AND PRINT THE VALLEY/PEAK RATIO VS RANGE CURVE ****
-            READ (5,*) ((XY(I,J), I = 1,2), J = 1, NXY)
-            WRITE (6,160) ((XY(I,J), I = 1,2), J = 1, NXY)
-  160       FORMAT (5X, 'INPUT VALLEY/PEAK RATIO VS RANGE CURVE FOR'
-     1                  'RANGE TRUNCATION'/ 8X, 5(F7.3, F10.0, 4X) / 
-     2                   8X, 5(F7.3, F10.0, 4X))
-            WRITE (11,*) 'XY ',((XY(I,J), I = 1,2), J = 1, NXY)
-  170       IF (NPSS .EQ. 0) GO TO 190
-C***********  READ IN AND PRINT NUMBER OF FLIGHTS                *******
-C***********  AFTER WHICH A SPECTRUM SUMMATION IS TO BE PRINTED  *******
-            READ (5,*) (ISS(I), I = 1, NPSS)
-            WRITE (6,180) (ISS(I), I = 1, NPSS)
-  180       FORMAT (5X, 'INPUT FLIGHT NUMBERS FOR SPECTRUM SUMMATION ' 
-     1                  'PRINT'/ (5X, 20I6))
-  190       REWIND 3
-            WRITE (11,*) 'ISS ',(ISS(I), I = 1, NPSS)
-C*********** READ IN AND PRINT A6PA REFERENCDE RUN, CASE NUMBER,  ******
-C*********** AND SEGMENTS FROM TAPE UNIT 3.                       ******
-            IF (LINE .LT. 55) GO TO 200
-            CALL NEWPG
-            LINE = 4
-  200       IS2 = 0
-            JSS = 0
-            NST = 0
-            WRITE (6,210)
-  210       FORMAT (4X, 'FLIGHT', 6X, 'RR', 5X, 'CASE', 5X,
-     1      'A6PA SEGMENTS'/)
-            LINE = LINE + 2
-            DO 260 I = 1, NFT
-               IS1 = IS2 + 1
-               NST = NST + NS(I)
-            WRITE (11,*) 'NST,JSS ',NST,JSS
-            !close(11)
-            !open(unit=11, access='APPEND')
-               IF (NST .EQ . JSS) GO TO 230
-               IF (NST .LT. JSS) GO TO 240
-  220          READ (3) IRR, ICASE, ISEG
-            WRITE (11,*) 'IRR, ICASE, ISEG ',IRR, ICASE, ISEG
-            !close(11)
-            !open(unit=11, access='APPEND')
-               ISP = JSS
-               JSS = JSS + ISEG
-               IF (NST .LT. JSS) GO TO 240
-  230          IS2 = ISEG
-               WRITE (6,250) I, IRR, ICASE, IS1, IS2
-               LINE = LINE + 1
-               IF (NST .NE. JSS) GO TO 220
-               IS2 = 0
-               GO TO 260
-  240          IS2 = MST - ISP
-               WRITE (6,250) I, IRR, ICASE, IS1, IS2
-               LINE = LINE + 1
-  250          FORMAT (I8, 4X, I6, 2X, I6, 6X, 2I6)
-  260       CONTINUE
-            !close(6)
-            !open(unit=6, access='APPEND')
-            NF1ST = 0
-            NF2ST = 0
-            IS1 = 1
-            IS2 = 0
-C*************  READ IN AND PRINT F1 AND F2 SEGMENTS              ******
-            IF (LINE .LT. 50) GO TO 270
-            CALL NEWPG
-            LINE = 4
-  270       DO 320 I = 1, NFT
-               IS2 = IS2 + NS(I)
-               write(6,*) ' 1932'
-               READ (5,*) (IF1(J), J = IS1, IS2)
-               READ (5,*) (IF2(J), J = IS1, IS2)
-               WRITE (6,280) I, NF(I), NS(I)
-  280          FORMAT (4X, 'FLIGHT TYPE', I5, ' HAS', I6, ' FLIGHTS AND', 
-     1                 I5, ' A6PA SEGMENTS')
-               WRITE (6,290) (IF1(J), J = IS1, IS2)
-  290          FORMAT (8X, 'F1 SEGMENTS', 35I3)
-               WRITE (6,300) (IF2(J), J = IS1, IS2)
-  300          FORMAT (8X, 'F2 SEGMENTS', 35I3)
-               MAX = 0
-               MBX = 0
-               DO 310, J = IS1, IS2
-                  IF (IF1(J) .GT. MAX) MAX = IF1(J)
-                  IF (IF2(J) .GT. MBX) MBX = IF2(J)
-  310          CONTINUE
-               NF1ST = NF1ST + MAX
-               NF2ST = NF2ST + MBX
-               LINE = LINE + 4
-               IF (LINE.LT.51) GO TO 320
-               LINE = 4
-               CALL NEWPG
-  320       IS1 = IS1 + NS(I)
-            !close(6)
-            !open(unit=6, access='APPEND')
-
-  330       FORMAT (1X, 5F12.2)
-  340       FORMAT (1X, 'IN F1 F2', 20I6)
-            IF (IFRS .EQ. 0) GO TO 360
-C************  READ IN USER SPECIFIED FLIGHT SEQUENCE            *******
-            READ (5,*) ((NFRS(I,J), I = 1,2), J = 1, IFRS)
-            WRITE (6,350) ((NFRS(I,J), I = 1,2), J = 1, IFRS)
-  350       FORMAT (4X, 'INPUT FLIGHT SEQUENCE' / 
-     1             (1X, 8(14I6, 5X)))
-C************ CALCULATE THE STARTING POINT WITHIN N ARRAY        *******
-C************ (WHICH IS REALLY THE A ARRAY) FOR EACH ARRAY       *******
-C************ USED IN THE SUBROUTINE INMNN.                      *******
-  360       M3 = (LEFT - NST) / 3
-            MAX = 1
-            MIN = MAX + M3
-            MCY = MIN + M3
-            MS2 = MCY + M3
-            CALL INMMN (NFT, NS, IF1, IF2, NST, N(MAX), N(MIN), 
-     1                  N(MCY), NF1ST, NF2ST, MMN, M3, NS1, NS2, NTF, 
-     2                  NF, N(MS2))
-            WRITE (11,*) 'LEFT, NST, M3',LEFT, NST, M3
-            DO 370 I =1, MMN
-               N(MMN + I) = N(MIN + I - 1)
-  370       N(2 * MMN + I) = N(MCY + I -1)
-            WRITE (11,*) 'MCY+MMN',MCY+MMN
-            !close(11)
-            !open(unit=11, access='APPEND')
-C************ CALCULATE THE STARTING POINT WITHIN THE N ARRAY    *******
-C************ (WHICH IS REALLY THE A ARRAY) FOR EACH ARRAY       *******
-C************ USE IN THE SUBROUTINE GENFL.                       *******
-            MHPEAK = (2 + IRS) * MMN + 1
-            MIDP = MHPEAK  + MAXHP
-            MPMAX = MIDP + MAXHP
-            MCY = MPMAX
-            MINDEX = MCY
-            MJTN = MINDEX
-            MFF = MJTN
-            IF (IAFS .EQ. 0) GO TO 380    ! ?PSV
-            MCY = MPMAX + NTF
-            MINDEX = MCY + NTF
-            MJTN = MINDEX + (NTF + 1)
-            MFF = MJTN + NTF
-            CALL OPENMS (4, N(MINDEX), (NTF+1), 0)
-  380       MRR = MFF + 2 * NFT
-            NNRAN = NRAN + 1
-            NNPI = NPI + 1
-            MPR = MRR + (IVP + 2) * NNRAN
-            MIRR = MPR + (IVP + 2) * NNPI
-            NRMAX = MAX0(NNRAN,NNPI)
-            MMS = MIRR + (IVP + 2) * NRMAX
-            JLEFT = LEFT
-            LEFT = LEFT - MMS
-            IF (LEFT .LT. 0) CALL ERROR (1,LEFT,NSIZE,MMS)
-            MAXSS = LEFT / 2
-            IF ((IFI .NE. 0) .AND. (IAFS .NE. 0)) REWIND IFI
-C************ CALCULATE THE FLIGHT SEQENCE                       *******
-          write(11,*)'MMN,MRR,MPR,MIRR,MPMAX,MCY,MFF,MHPEAK,MIDP,MJTN'
-     1     , MMN,MRR,MPR,MIRR,MPMAX,MCY,MFF,MHPEAK,MIDP,MJTN
-            close(11)
-            open(unit=11, access='APPEND')
-            CALL GENFL (NF, NFT, NTF, NS, NST, N(1), N(MMN+1), 
-     1                  N(2*MMN+1), MMN, IF2, N(MMS), MAXSS, PI, RAN, 
-     2                  VP, XY, N(MRR), NNRAN, N(MPR), NNPI, N(MIRR),
-     3                  NRMAX, ISS, N(MPMAX), N(MCY), N(MFF), NFRS, 
-     4                  N(MHPEAK), N(MIDP), N(MJTN))
-            
-C************ CALCULATE THE STARTING POINT WITHIN THE N ARRAY    *******
-C************ (WHICH IS REALLY THE A ARRAY) FOR EACH ARRAY       *******
-C************ USE IN THE SUBROUTINE GENAFAS.                     *******
-            MREC = MIRR + (IVP + 2) * NRMAX
-            MAFS = MREC + NTF
-            MFLG = MAFS + NTF
-            MMS = MFLG + NTF
-            LEFT = JLEFT
-            LEFT = LEFT - MMS
-            WRITE(11,*)'iafs, LEFT ',iafs, LEFT
-            close(11)
-            open(unit=11,access='APPEND')
-            IF (LEFT .LT. 0) CALL ERROR (1,LEFT,NSIZE,MMS)
-            IF (IAFS .EQ. 0) RETURN
-C************  GENERATE THE ALTERNATE FLIGHT SEQUENCE            *******
-            CALL GENAFS (N(MCY), N(MPMAX), N(MREC), N(MAFS), N(MFLG), 
-     1                   NTF, N(MMS), N(MRR), NNRAN, N(MPR), NNPI, 
-     2                   N(MIRR), NRMAX, PI, RAN, VP, N(MFF), ISS, NFT, 
-     3                   N(MHPEAK), N(MIDP), N(MJTN))
-            IF (IFI .EQ. 0) RETURN
-C************ SAVE THE ALTERNATE FLIGHT SEQUENCE ON MAGNETIC TAPE ******
-            MMS = MFLG
-            CALL WTAPE (N(MREC), N(MCY), N(MMS), NTF, NTF)
             RETURN
          END
 
@@ -2406,6 +2118,14 @@ C***********  SUBROUTINES CALLED - DISTRD, GENCY, PRNTSS          ******
             DIMENSION PMAX(NTF), MCY(NTF), JTN(NTF), IRR(NRMAX,1), 
      1                IJJ(6), ISS(*)
             DIMENSION IPF(2,1), NFF(2,NFT), HPEAK(*), IDPEAK(*)
+            WRITE(22,*)'NFT, NTF, NST, NMM, MAXSS ',
+     1      NFT, NTF, NST, NMM, MAXSS
+            WRITE(22,*)'NF ', NF(1:NFT)
+            WRITE(22,*)'NS ', NS(1:NFT)
+            WRITE(22,*)'SMAX ', SMAX(1:NMM)
+            WRITE(22,*)'SMIN ', SMIN(1:NMM)
+            WRITE(22,*)'IS2 ', IS2(1:NST)
+            WRITE(22,*)'SMM ', SMM
    20       FORMAT (1X, 'GEN FL', 20I6)
    30       FORMAT (1X, 'GEN FL', 10F12.2)
             write(12,*) 'RR0',((RR(i8,j8), i8=1,nnran),j8=1,28)
