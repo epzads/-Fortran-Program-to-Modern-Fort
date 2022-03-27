@@ -688,7 +688,7 @@
       'CUMULATIVE CYCLES', 2X, 'MAX STRESS', 2X 'MIN STRESS',      &
       8X, 'CYCLES', 10X, 'ALLOWABLE', 8X, 'DAMAGE', 2X,            &
       'CUM DAMAGE')
- 1000 FORMAT (1H, 4X, I2, F13.3,1X,F16.4)
+ 1000 FORMAT (1H , 4X, I2, F13.3,1X,F16.4)
  1020 FORMAT (1H , 4X, I2, 32X, F10.0, 2X, F10.0, 2X, F16.4,       &
               2X, F16.0, 1X, F11.7, 1X, F11.7)
  1040 FORMAT (38X, F10.0, 2X, F10.0, 2X, F16.4, 2X, F16.0,         &
@@ -754,8 +754,8 @@
 !            LOC      IMTEGER LOCATION FIELDS
 !            DATA     DATA FIELD (FLOAT IF COLUMN 1 CONTAINS "F"
 !                                 AND INTEGER IF COLUMN 1 CONTAINS "I" )
-!            REFNO    INTEGER REFERENCE RUN NUMBER (NOT USED NOW)
-!            CASENO   INTEGER CASE NUMBER
+!            REFNO    INTEGER REFERENCE RUN NUMBER (NOT USED NOW, SHOULD BE 0)
+!            CASENO   INTEGER CASE NUMBER (!=0)
 !
       REAL :: CASE(NCASE), RAREA(NCASE)
       INTEGER NCASE, IENTRY, IREF, ICAS, KP
@@ -1647,38 +1647,35 @@
       CALL INPUTF(NFT, N(1), N(NFT+1), N(2*NFT+1), NST, IRAN, IPI, KVP)
 
       RETURN
-   30 FORMAT (                                                      &
-      15X, 'NUMBER OF FLIGHT TYPES IS.......................', I5/  &
-      15X, 'VALLEY/PEAK COUPLING IS..(1=A6PA, 2=RANDOM).....', I5/  &
-      15X, 'FLIGHT SEQUENCE IS..(C=RANDOM...................', I5/  &
-      15X, '..........(N=INPUT FLIGHT SEQUENCE, NSETS)......', /    &
-      15X, 'FORTRAN UNIT NUMBER IS..........................', I5/  &
-      15X, 'NUMBER OF INPUT PEAK LEVELS IS..................', I5/  &
-      15X, 'NUMBER OF INPUT RANGE LEVELS IS.................', I5/  &
-      15X, 'NUMBER OF INPUT VALLEY/PEAK RATIOS IS...........', I5/  &
-      15X, 'SAVE SPECTRUM ON MAGNETIC TAPE..................', I5/  &
-      15X, '..........................(0 = NO, 3 = YES).....', /    &
-      15X, 'NUMBER OF POINTS OF THE RANGE VS R INPUT CURVE '        &
-           'IS....', I5/                                            &
-      15X, 'PRINT FLIGHT SEQUENCE (-1 = NO, 0 = ALL, N = '          &
-           'NUMBER).', I5/                                          &
-      15X, 'NUMBER OF SPECTRUM SUMMATIONS TO BE PRINTED ....', I5/  &
-      15X, 'PROGRAM TERMINATION FLAG (0 = NORMAL, ..........', /    &
-      15X, '..................M = STOP AFTER M FLIGHTS......', I5/  &
-      15X, 'ALTERNATE FLIGHT SEQUENCE FLAG..................', I5/  &
-      15X, '.(0 = REANDOM, 1=LOW-HI, 2=HI-LOW, 3=LO-HI-LO)....', /  &
+   30 FORMAT (                                                       &
+      15X, 'NUMBER OF FLIGHT TYPES IS........................', I5/  &
+      15X, 'VALLEY/PEAK COUPLING IS..(1=A6PA, 2=RANDOM)......', I5/  &
+      15X, 'FLIGHT SEQUENCE IS..(C=RANDOM....................', I5/  &
+      15X, '..........(N=INPUT FLIGHT SEQUENCE, NSETS).......', /    &
+      15X, 'FORTRAN UNIT NUMBER IS...........................', I5/  &
+      15X, 'NUMBER OF INPUT PEAK LEVELS IS...................', I5/  &
+      15X, 'NUMBER OF INPUT RANGE LEVELS IS..................', I5/  &
+      15X, 'NUMBER OF INPUT VALLEY/PEAK RATIOS IS............', I5/  &
+      15X, 'SAVE SPECTRUM ON MAGNETIC TAPE...................', I5/  &
+      15X, '..........................(0 = NO, 3 = YES)......', /    &
+      15X, 'NUMBER OF POINTS OF THE RANGE VS R INPUT CURVE IS', I5/  &
+      15X, 'PRINT FLIGHT SEQUENCE (-1=NO, 0=ALL, N=NUMBER)...', I5/  &
+      15X, 'NUMBER OF SPECTRUM SUMMATIONS TO BE PRINTED .....', I5/  &
+      15X, 'PROGRAM TERMINATION FLAG (0 = NORMAL, ...........', /    &
+      15X, '..................M = STOP AFTER M FLIGHTS.......', I5/  &
+      15X, 'ALTERNATE FLIGHT SEQUENCE FLAG...................', I5/  &
+      15X, '.(0 = REANDOM, 1=LOW-HI, 2=HI-LOW, 3=LO-HI-LO)...', /    &
       15X, 'NUMBER OF HIGHEST PEAKS PER FLIGHT TO BE PRINTED.',I5)
-   40 FORMAT (                                                      &
-      15X, 'STARTING VALUE FOR THE GENERATION OF RANDOM.......',/   &
-      15X, '.FLIGHT NUMBERS (0 = DEFAULT DEFINED AS 11111).', I5/   &
-      15X, 'STARTING VALUE FOR THE RANDOM CYCLE GENERATION.', I5/   &
-      15X, '.........(0 = DEFAULT DEFINED AS 12345)...........')
+   40 FORMAT (                                                       &
+      15X, 'STARTING VALUE FOR THE GENERATION OF RANDOM......',/     &
+      15X, '.FLIGHT NUMBERS (0 = DEFAULT DEFINED AS 11111)...', I5/  &
+      15X, 'STARTING VALUE FOR THE RANDOM CYCLE GENERATION...', I5/  &
+      15X, '.........(0 = DEFAULT DEFINED AS 12345)..........')
    50 FORMAT (                                                      &
-       15X,'PEAK CLIPPING VALUE IS.............................',   &
-       F10.0 / 15X, 'VALLEY CLIPPING VALUE IS....................'  &
-       '.....', F10.0 / 15X, 'MULTIPLICATION FACTOR IS..........'   &
-       '...............', F10.5 / 15X, 'CYCLE ELIMINATION PEAK'     &
-       'VALUE IS.................', F10.0//)
+       15X,'PEAK CLIPPING VALUE IS......................',F10.0 /   &
+       15X,'VALLEY CLIPPING VALUE IS....................',F10.0 /   &
+       15X,'MULTIPLICATION FACTOR IS....................',F10.5 /   &
+       15X,'CYCLE ELIMINATION PEAKVALUE IS..............',F10.0//)
       END
 
       SUBROUTINE INPUTF (NFT, NF, NS, A, NST, IRAN, IPI, KVP)
@@ -2160,7 +2157,7 @@
                      ELSE
                         IF (MAX .EQ. 0) THEN
                            SMAX(KQQ+1) = SMAX(KQ)
-                           SMIN(KQQ+1) = SMIN(KQ)
+                           SMIN(KQQ+1) = SMAX(KQ)
                         ELSE
                            SMAX(KQQ+1) = (SMAX(KQ) + SMIN(KQ)) / 2.0
                            SMIN(KQQ+1) = SMAX(KQQ+1)
@@ -2639,6 +2636,7 @@
             ELSE
                IF (ALL(XY(1,2:NXY) .LT. R)) THEN
                   IF (NERR5 .LT. 6) CALL ERROR (5, II, IMM, 2)
+                  NERR5 = NERR5 + 1
                   K = NXY
                ELSE
                   K=MINLOC(XY(1,1:NXY),1,MASK=(XY(1,1:NXY).GE.R))
@@ -2752,7 +2750,7 @@
       SMM(1,1) = SMM(1,IMM) / FACTOR
       SMM(2,1) = SMM(2,IMM) / FACTOR
       RETURN
-   30 FORMAT ('  FLIGHT NUMBER', I4, '  IS TUPE NUMBER', I3,     &
+   30 FORMAT ('  FLIGHT NUMBER', I4, '  IS TYPE NUMBER', I3,     &
               '    NUMBER OF CYCLES', I7,'  SEQUENCE FOLLOWS ')
   330 FORMAT (10F12.2)
       END
